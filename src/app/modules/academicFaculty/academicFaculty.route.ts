@@ -19,3 +19,6 @@ AcademicFacultyController.getAll
 router.get('/:id',
 AcademicFacultyController.getById
 );
+
+
+export const academicFacultyRoutes = router;
