@@ -1,5 +1,5 @@
 import { PrismaClient, Student } from "@prisma/client";
-import searchFilter, { FilterOption } from "../../../constants/filterOption";
+import { FilterOption } from "../../../constants/filterOption";
 import { paginationHelpers } from "../../../helpers/paginationHelper";
 import { IGenericResponse } from "../../../interfaces/common";
 import { IPaginationOptions } from "../../../interfaces/pagination";
@@ -20,13 +20,13 @@ const insertIntoDB =async(data: Student) => {
 
 const getAll= async (filter: IStudentFilterRequest, options: IPaginationOptions): Promise<IGenericResponse<Student[]>> => {
 
-    const { page, limit, sortBy, sortOrder,skip } = paginationHelpers.calculatePagination(options);
+    const { page, limit,skip } = paginationHelpers.calculatePagination(options);
     const {searchTerm, ...filterData}  = filter;
 
     const andCondition = [];
 
     if(searchTerm){
-     const search =  searchFilter(searchTerm, studentSearchableFields);
+     const search =  FilterOption.searchFilter(searchTerm, studentSearchableFields);
      andCondition.push(search);
     }
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AcademicSemester, PrismaClient } from "@prisma/client";
 import { FilterOption } from "../../../constants/filterOption";
 import { paginationHelpers } from "../../../helpers/paginationHelper";
