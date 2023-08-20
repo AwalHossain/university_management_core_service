@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AcademicDepartment, PrismaClient } from '@prisma/client';
-import searchFilter from '../../../constants/searchFilter';
+import searchFilter from '../../../constants/filterOption';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';

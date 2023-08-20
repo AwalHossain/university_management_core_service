@@ -1,5 +1,5 @@
 import { AcademicSemester, PrismaClient } from "@prisma/client";
-import searchFilter from "../../../constants/searchFilter";
+import { FilterOption } from "../../../constants/filterOption";
 import { paginationHelpers } from "../../../helpers/paginationHelper";
 import { IGenericResponse } from "../../../interfaces/common";
 import { IPaginationOptions } from "../../../interfaces/pagination";
@@ -23,11 +23,11 @@ const getAll = async (filter: IAcademicSemesterFilterRequest, options: IPaginati
         const { limit, page, skip, } = paginationHelpers.calculatePagination(options);
         const { searchTerm, ...filterOptions } = filter;
         const andCondition = [];
-        const search = {};
         if (searchTerm) {
-            searchFilter(searchTerm, academicSemesterSearchableFields);
+            const search = FilterOption.searchFilter(searchTerm, academicSemesterSearchableFields);
+            andCondition.push(search)
+            andCondition.push(search)
         }
-        andCondition.push(search)
     
         if (Object.keys(filterOptions).length > 0) {
             andCondition.push({
