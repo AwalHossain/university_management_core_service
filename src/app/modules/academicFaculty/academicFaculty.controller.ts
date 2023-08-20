@@ -5,9 +5,10 @@ import catchAsync from "../../../shared/catchAsync";
 import pick from "../../../shared/pick";
 import sendResponse from "../../../shared/sendResponse";
 import { academicFacultyFilterableFields } from "./academicFaculty.constant";
+import { AcademicFacultyService } from "./academicFaculty.service";
 
 const insertIntoDB = catchAsync(async (req:Request, res:Response) => {
-    const result = await acdemicFaculty.insertIntoDB(req.body);
+    const result = await AcademicFacultyService.insertIntoDB(req.body);
 
     sendResponse(res,{
         success: true,
@@ -25,7 +26,7 @@ const getAll= catchAsync(async (req: Request, res: Response) => {
     const filter = pick(req.query, academicFacultyFilterableFields);
     const options = pick(req.query, paginationFields);
 
-    const result = await acdemicFaculty.getAll(filter, options);
+    const result = await AcademicFacultyService.getAll(filter, options);
 
     sendResponse(res,{
         success: true,
@@ -41,7 +42,7 @@ const getAll= catchAsync(async (req: Request, res: Response) => {
 
 const getById = catchAsync(async (req: Request, res: Response) => {
         
-        const result = await acdemicFaculty.getById(req.params.id);
+        const result = await AcademicFacultyService.getById(req.params.id);
     
         sendResponse(res,{
             success: true,
@@ -53,7 +54,7 @@ const getById = catchAsync(async (req: Request, res: Response) => {
     });
 
 
-export const academicDepartmentController = {
+export const AcademicFacultyController = {
     insertIntoDB,  
     getAll,
     getById
