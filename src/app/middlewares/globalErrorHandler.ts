@@ -53,15 +53,26 @@ const globalErrorHandler: ErrorRequestHandler = (
         ]
       : [];
   } else if (error instanceof Error) {
-    message = error?.message;
-    errorMessages = error?.message
-      ? [
-          {
-            path: '',
-            message: error?.message,
-          },
-        ]
-      : [];
+    if (error?.message?.includes('Unique constraint failed')) {
+      statusCode = 400;
+      message = 'Duplicate entry';
+    } else if (error?.message?.includes('Foreign key constraint failed')) {
+      statusCode = 400;
+      message = 'Foreign key constraint failed';
+    } else if (error?.message?.includes('Record does not exist')) {
+      statusCode = 404;
+      message = 'Record does not exist';
+    } else {
+      message = error?.message;
+      errorMessages = error?.message
+        ? [
+            {
+              path: '',
+              message: error?.message,
+            },
+          ]
+        : [];
+    }
   }
 
   res.status(statusCode).json({
