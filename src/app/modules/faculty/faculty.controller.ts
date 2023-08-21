@@ -4,13 +4,12 @@ import { paginationFields } from "../../../constants/pagination";
 import catchAsync from "../../../shared/catchAsync";
 import pick from "../../../shared/pick";
 import sendResponse from "../../../shared/sendResponse";
-import { academicFacultyFilterableFields } from "../academicFaculty/academicFaculty.constant";
-import { AcademicFacultyService } from "../academicFaculty/academicFaculty.service";
-import { academicSemesterService } from "./academicSemester.service";
+import { facultyFilterableFields } from "./faculty.constant";
+import { FacultyService } from "./faculty.service";
 
 
 const insertIntoDB = catchAsync(async (req:Request, res:Response) => {
-    const result = await academicSemesterService.insertIntoDB(req.body);
+    const result = await FacultyService.insertIntoDB(req.body);
 
     sendResponse(res,{
         success: true,
@@ -24,10 +23,10 @@ const insertIntoDB = catchAsync(async (req:Request, res:Response) => {
 
 
 const getAll= catchAsync(async (req: Request, res: Response) => {
-    const filter = pick(req.query, academicFacultyFilterableFields);
+    const filter = pick(req.query, facultyFilterableFields);
     const options = pick(req.query, paginationFields);
 
-    const result = await AcademicFacultyService.getAll(filter, options);
+    const result = await FacultyService.getAll(filter, options);
 
     sendResponse(res,{
         success: true,
@@ -42,7 +41,7 @@ const getAll= catchAsync(async (req: Request, res: Response) => {
 
 const getById = catchAsync(async (req: Request, res: Response) => {
         
-        const result = await AcademicFacultyService.getById(req.params.id);
+        const result = await FacultyService.getById(req.params.id);
     
         sendResponse(res,{
             success: true,
@@ -54,7 +53,7 @@ const getById = catchAsync(async (req: Request, res: Response) => {
     });
 
 
-export const AcademicSemesterController = {
+export const FacultyController = {
     insertIntoDB,
     getAll,
     getById

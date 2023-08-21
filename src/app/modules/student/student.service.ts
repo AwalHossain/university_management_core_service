@@ -4,7 +4,7 @@ import { paginationHelpers } from "../../../helpers/paginationHelper";
 import { IGenericResponse } from "../../../interfaces/common";
 import { IPaginationOptions } from "../../../interfaces/pagination";
 import { studentRelationalFields, studentRelationalFieldsMapper, studentSearchableFields } from "./student.constant";
-import { IStudentFilterRequest } from "./student.controller";
+import { IStudentFilterRequest } from "./student.interface";
 
 const prisma = new PrismaClient();
 
@@ -76,7 +76,7 @@ const getById = async (id: string) => {
 
 
 
-export const studentService = {
+export const StudentService = {
     insertIntoDB,
     getAll,
     getById
