@@ -11,7 +11,12 @@ const prisma = new PrismaClient();
 
 const insertIntoDB =async(data: Student) => {
     const result = await prisma.student.create({
-        data
+        data,
+        include:{
+            academicFaculty:true,
+            academicSemester:true,
+            acdemicDepartment:true,
+        }
     });
     return result;
 }

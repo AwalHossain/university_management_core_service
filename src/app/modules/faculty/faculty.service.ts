@@ -13,7 +13,11 @@ const prisma = new PrismaClient();
 
 const insertIntoDB = async (data: Faculty): Promise<Faculty> => {
     const result = await prisma.faculty.create({
-        data
+        data,
+        include: {
+            academicFaculty: true,
+            academicDepartment: true,
+        },
     })
     return result;
 }

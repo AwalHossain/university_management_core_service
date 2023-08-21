@@ -14,8 +14,10 @@ const prisma = new PrismaClient();
 
 const insertIntoDB = async (data: AcademicFaculty): Promise<AcademicFaculty> => {
     const result = await prisma.academicFaculty.create({
-        data
-    })
+        data,
+    },
+    
+    )
     return result;
 }
 

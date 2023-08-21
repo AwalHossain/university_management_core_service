@@ -8,11 +8,11 @@ const router = Router();
 
 
 
-router.post('/insertIntoDB', 
+router.post('/', 
 validateRequest(AcademicSemesterValidator.create),
 AcademicSemesterController.insertIntoDB);
 
-router.get('/getAll',
+router.get('/',
 AcademicSemesterController.getAll);
 router.get('/:id',
 AcademicSemesterController.getById);
