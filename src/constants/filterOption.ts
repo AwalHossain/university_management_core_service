@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { IStudentFilterRequest } from "../app/modules/student/student.controller";
 
 
 
@@ -22,7 +21,7 @@ const searchFilter = (
 
 
 
-const objectFilter = (filterOption: IStudentFilterRequest, relationalFields: any, relationalFieldMapper: any) => {
+const objectFilter = (filterOption: any, relationalFields: any, relationalFieldMapper: any) => {
  const result =   Object.keys(filterOption).map((key) => {
         if(relationalFields.includes(key)){
             return{
