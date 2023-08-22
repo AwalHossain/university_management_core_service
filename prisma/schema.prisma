@@ -103,11 +103,12 @@ model Building {
 
 model Room {
   id         String   @id @default(uuid())
-  title      String
+  roomNumber String
+  floor      String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  buildingId String
   building   Building @relation(fields: [buildingId], references: [id])
+  buildingId String
 
   @@map("rooms")
 }
