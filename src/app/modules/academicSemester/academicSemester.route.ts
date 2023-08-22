@@ -18,4 +18,4 @@ router.get('/:id',
 AcademicSemesterController.getById);
 
 
-export const AcademicSemesterRoutes = router;
+export const academicSemesterRoutes = router;

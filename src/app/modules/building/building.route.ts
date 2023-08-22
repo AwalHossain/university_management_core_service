@@ -1,7 +1,4 @@
 
-
-
-
 import express from 'express';
 import { BuildingController } from './building.controller';
 
@@ -19,4 +16,4 @@ router.get(
 )
 
 
-export const roomRoutes = router;
+export const buildingRoutes = router;

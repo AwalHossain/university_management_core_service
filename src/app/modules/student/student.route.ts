@@ -18,4 +18,4 @@ router.get('/:id',
 StudentController.getById);
 
 
-export const StudentRoutes = router;
+export const studentRoutes = router;
