@@ -39,7 +39,55 @@ const getAll = catchAsync(async (req:Request, res:Response) => {
 });
 
 
+const getById = catchAsync(async (req:Request, res:Response) => {
+    const { id } = req.params;
+
+    const result = await BuildingService.getById(id);
+
+    sendResponse(res,{
+        success: true,
+        data: result,
+        message: 'Data fetched successfully',
+        statusCode: httpStatus.OK
+    })
+});
+
+
+const updateById = catchAsync(async (req:Request, res:Response) => {
+    const { id } = req.params;
+
+    const result = await BuildingService.updateById(id, req.body);
+
+    sendResponse(res,{
+        success: true,
+        data: result,
+        message: 'Data updated successfully',
+        statusCode: httpStatus.OK
+    })
+});
+
+
+const deleteById = catchAsync(async (req:Request, res:Response) => {
+    const { id } = req.params;
+
+    const result = await BuildingService.deleteById(id);
+
+    sendResponse(res,{
+        success: true,
+        data: result,
+        message: 'Data deleted successfully',
+        statusCode: httpStatus.OK
+    })
+});
+
+
+
+
 export const BuildingController = {
     insertIntoDB,
-    getAll
+    getAll,
+    getById,
+    updateById,
+    deleteById,
+    
 }

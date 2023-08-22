@@ -66,8 +66,49 @@ IGenericResponse< Building[]| null>
         }
 }
 
+const getById = async (id: string): Promise<Building | null> => {
+    const result = await prisma.building.findUnique({
+        where: {
+            id
+        },
+        include: {
+            rooms: true
+        }
+    })
+    return result;
+}
+
+
+const updateById = async (id: string, payload: Partial<Building>): Promise<Building | null> => {
+
+    const result = await prisma.building.update({
+        where: {
+            id
+        },
+        data: payload
+    })
+    return result;
+}
+
+const deleteById = async (id: string): Promise<Building | null> => {
+    const result = await prisma.building.delete({
+        where: {
+            id
+        }
+    })
+    return result;
+}
+
+
+
+
+
 
 export const BuildingService = {
     insertIntoDB,
-    getAll
+    getAll,
+    getById,
+    updateById,
+    deleteById,
+    
 }
