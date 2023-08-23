@@ -19,6 +19,10 @@ const insertIntoDB = catchAsync(async(req: Request, res: Response) => {
 })
 
 
+
+
+
+
 export const CourseController = {
     insertIntoDB
 }

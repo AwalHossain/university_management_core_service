@@ -42,8 +42,23 @@ const objectFilter = (filterOption: any, relationalFields: any, relationalFieldM
     
 }
 
+const filterCondition = (filterData: any)=>{
+    const result = Object.keys(filterData).map((key) => (
+        {
+            [key]: {
+                equals: (filterData as any) [key]
+            }
+
+        }
+
+    ))
+    return result;
+}
+
+
 
 export const FilterOption ={
     searchFilter,
-    objectFilter
+    objectFilter,
+    filterCondition
 } 
