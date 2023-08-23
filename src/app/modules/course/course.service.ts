@@ -126,7 +126,99 @@ const getAll = async (data:ICourseRequest, options: IPaginationOptions):Promise<
 
 
 }
+
+
+const getById = async (id: string): Promise<Course | null> => {
+    const result = await prisma.course.findUnique({
+        where: {
+            id
+        },
+        include: {
+            preRequisite: {
+                include: {
+                    prerequisite: true
+                }
+            },
+            preRequisiteFor: {
+                include: {
+                    course: true
+                }
+
+            }
+        }
+    })
+
+    return result;
+}
+
+
+const updateById = async (id: string, payload: Partial<IcourseCreateData>): Promise<Course | null> => {
+
+    const { preRequisiteCourses, ...courseData } = payload;
+
+    const result = await prisma.$transaction(async (tx) => {
+        const course = await tx.course.update({
+            where: {
+                id
+            },
+            data: courseData
+        })
+        
+        if (preRequisiteCourses && preRequisiteCourses.length > 0) {
+            for (let i = 0; i < preRequisiteCourses.length; i++) {
+                const createPreRequisite = await tx.courseToPrerequisite.create(
+                    {
+                        data: {
+                            courseId: course.id,
+                            preRequisiteId: preRequisiteCourses[i].courseId
+                        }
+                    })
+                console.log(createPreRequisite, "createPreRequisite");
+                
+            }
+
+        }
+        return course;
+    })
+
+    return result;
+}
+
+const deleteById = async (id: string): Promise<Course | null> => {
+
+    const result = await prisma.$transaction(async (prisma) => {
+
+        await prisma.courseToPrerequisite.deleteMany({
+            where: {
+                OR:[
+                    {
+                        courseId: id
+                    },
+                    {
+                        preRequisiteId: id
+                    }
+                ]
+            }
+        })
+    
+        const course = await prisma.course.delete({
+            where: {
+                id
+            }
+        })
+        return course;
+    })
+
+    return result;
+}
+
+
+
+
 export const CourseService = {
     insertIntoDB,
     getAll,
+    getById,
+    updateById,
+    deleteById,
 }
