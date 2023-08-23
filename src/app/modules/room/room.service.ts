@@ -11,8 +11,13 @@ const prisma = new PrismaClient();
 const insertIntoDB = async (data: Room): Promise<Room> => {
 
     const result = await prisma.room.create({
-        data
-    });
+        data,
+        include:{
+            building: true
+        }
+    }
+    
+    );
 
 
     return result;
@@ -76,6 +81,8 @@ const getAll = async (
 
 
 const getById = async (id: string): Promise<Room | null> => {
+    console.log(id,'id');
+    
     const result = await prisma.room.findUnique({
         where: {
             id
@@ -85,6 +92,8 @@ const getById = async (id: string): Promise<Room | null> => {
         }
     })
 
+    console.log(result,'result');
+    
     return result;
 }
 
