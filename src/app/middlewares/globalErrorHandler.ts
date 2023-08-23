@@ -4,10 +4,11 @@
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import config from '../../config';
 import ApiError from '../../errors/ApiError';
-import handleValidationError from '../../errors/handleValidationError';
 
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { ZodError } from 'zod';
 import handleCastError from '../../errors/handleCastError';
+import handlePrismaError from '../../errors/handlePrismaError';
 import handleZodError from '../../errors/handleZodError';
 import { IGenericErrorMessage } from '../../interfaces/error';
 import { errorlogger } from '../../shared/logger';
@@ -26,12 +27,7 @@ const globalErrorHandler: ErrorRequestHandler = (
   let message = 'Something went wrong !';
   let errorMessages: IGenericErrorMessage[] = [];
 
-  if (error?.name === 'ValidationError') {
-    const simplifiedError = handleValidationError(error);
-    statusCode = simplifiedError.statusCode;
-    message = simplifiedError.message;
-    errorMessages = simplifiedError.errorMessages;
-  } else if (error instanceof ZodError) {
+ if (error instanceof ZodError) {
     const simplifiedError = handleZodError(error);
     statusCode = simplifiedError.statusCode;
     message = simplifiedError.message;
@@ -53,26 +49,34 @@ const globalErrorHandler: ErrorRequestHandler = (
         ]
       : [];
   } else if (error instanceof Error) {
-    if (error?.message?.includes('Unique constraint failed')) {
-      statusCode = 400;
-      message = 'Duplicate entry';
-    } else if (error?.message?.includes('Foreign key constraint failed')) {
-      statusCode = 400;
-      message = 'Foreign key constraint failed';
-    } else if (error?.message?.includes('Record does not exist')) {
-      statusCode = 404;
-      message = 'Record does not exist';
-    } else {
-      message = error?.message;
-      errorMessages = error?.message
-        ? [
-            {
-              path: '',
-              message: error?.message,
-            },
-          ]
-        : [];
-    }
+  //  console.log(`🐱‍🏍 checking error ~~`, { error instanceof PrismaClientKnownRequestError});
+   
+      // extract error object here
+      const prismaError = error as PrismaClientKnownRequestError;
+      const prismaErrorCode = prismaError.code;
+      const prismaErrorMeta = prismaError.meta?.cause;
+      console.log(`🐱‍🏍 checking prisma error code ~~`, { prismaErrorCode, prismaErrorMeta });
+      if(prismaError){
+   const err =   handlePrismaError(prismaError);
+    statusCode = err.statusCode;
+    message = err.message;
+      }else{
+              message = error?.message;
+              errorMessages = error?.message
+                ? [
+                    {
+                      path: '',
+                      message: error?.message,
+                    },
+                  ]
+                : [];
+      }
+  } else if( error instanceof PrismaClientKnownRequestError) {
+    console.log(`🐱‍🏍 checking prisma eirro ~~`, { error });
+    
+    const prismaError = handlePrismaError(error);
+    statusCode = prismaError.statusCode;
+    message = prismaError.message;
   }
 
   res.status(statusCode).json({
