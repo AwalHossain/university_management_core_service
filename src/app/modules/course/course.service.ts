@@ -161,7 +161,21 @@ const updateById = async (id: string, payload: Partial<IcourseCreateData>): Prom
             where: {
                 id
             },
-            data: courseData
+            data: courseData,
+            include: {
+                preRequisite: {
+                    include: {
+                        prerequisite: true
+                    }
+                },
+                preRequisiteFor: {
+                    include: {
+                        course: true
+                    }
+
+                }
+            }
+
         })
         
         if (preRequisiteCourses && preRequisiteCourses.length > 0) {

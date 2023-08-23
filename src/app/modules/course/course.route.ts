@@ -15,7 +15,7 @@ CourseController.insertIntoDB)
 
 router.get('/', CourseController.getAll)
 router.get('/:id', CourseController.getById)
-router.put('/:id',
+router.patch('/:id',
 validateRequest(CourseValidation.update),
 CourseController.updateById)
 router.delete('/:id', CourseController.deleteById)
