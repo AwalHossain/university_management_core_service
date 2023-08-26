@@ -32,13 +32,34 @@ const update = z.object({
         preRequisiteCourses: z.array(
             z.object({
                 courseId: z.string(),
+                isDeleted: z.boolean()
             })
         ).optional(),
     
     })
     })
 
+
+
+    const assignOrRemoveFaculties = z.object({
+        body: z.object({
+            faculties: z.array(
+                z.object({
+                    facultyId: z.string({
+                        required_error: "Faculty Id is required"
+                    }),
+                })
+            )
+
+        })
+    })
+
+
+
+
+
 export const CourseValidation = {
     create,
-    update
+    update,
+    assignOrRemoveFaculties
 }

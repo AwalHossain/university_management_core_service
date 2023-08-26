@@ -8,11 +8,11 @@ import { courseFilterableFields } from "./course.constant";
 import { CourseService } from "./course.service";
 
 
-const insertIntoDB = catchAsync(async(req: Request, res: Response) => {
+const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
 
     const result = await CourseService.insertIntoDB(req.body);
 
-    sendResponse(res,{
+    sendResponse(res, {
         statusCode: httpStatus.CREATED,
         success: true,
         data: result,
@@ -22,14 +22,14 @@ const insertIntoDB = catchAsync(async(req: Request, res: Response) => {
 })
 
 
-const getAll = catchAsync(async(req: Request, res: Response) => {
+const getAll = catchAsync(async (req: Request, res: Response) => {
 
     const filter = pick(req.query, courseFilterableFields);
-    const options = pick(req.query,paginationFields );
+    const options = pick(req.query, paginationFields);
 
-    const result = await CourseService.getAll(filter,options);
+    const result = await CourseService.getAll(filter, options);
 
-    sendResponse(res,{
+    sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
         data: result,
@@ -38,11 +38,11 @@ const getAll = catchAsync(async(req: Request, res: Response) => {
     )
 })
 
-const getById = catchAsync(async(req: Request, res: Response) => {
+const getById = catchAsync(async (req: Request, res: Response) => {
 
     const result = await CourseService.getById(req.params.id);
 
-    sendResponse(res,{
+    sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
         data: result,
@@ -52,11 +52,11 @@ const getById = catchAsync(async(req: Request, res: Response) => {
 })
 
 
-const updateById = catchAsync(async(req: Request, res: Response) => {
+const updateById = catchAsync(async (req: Request, res: Response) => {
 
     const result = await CourseService.updateById(req.params.id, req.body);
 
-    sendResponse(res,{
+    sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
         data: result,
@@ -66,11 +66,11 @@ const updateById = catchAsync(async(req: Request, res: Response) => {
 })
 
 
-const deleteById = catchAsync(async(req: Request, res: Response) => {
+const deleteById = catchAsync(async (req: Request, res: Response) => {
 
     const result = await CourseService.deleteById(req.params.id);
 
-    sendResponse(res,{
+    sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
         data: result,
@@ -80,10 +80,47 @@ const deleteById = catchAsync(async(req: Request, res: Response) => {
 
 })
 
+const assignFaculty = catchAsync(async (req: Request, res: Response) => {
+
+    const { id } = req.params;
+    const { faculties } = req.body;
+    const result = await CourseService.assignFaculty(id, faculties);
+
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        data: result,
+        message: "Faculty assigned successfully"
+    }
+    )
+
+})
+
+const removeFaculty = catchAsync(async (req: Request, res: Response) => {
+
+    const { id } = req.params;
+    const { faculties } = req.body;
+
+    const result = await CourseService.removeFaculty(id, faculties);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        data: result,
+        message: "Faculty removed successfully"
+    }
+    )
+
+})
+
+
 export const CourseController = {
     insertIntoDB,
     getAll,
     getById,
     updateById,
-    deleteById
+    deleteById,
+    assignFaculty,
+    removeFaculty
 }
