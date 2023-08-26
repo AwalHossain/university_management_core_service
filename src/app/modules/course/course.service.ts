@@ -6,7 +6,7 @@ import { paginationHelpers } from "../../../helpers/paginationHelper";
 import { IGenericResponse } from "../../../interfaces/common";
 import { IPaginationOptions } from "../../../interfaces/pagination";
 import { courseSearchableFields } from "./course.constant";
-import { ICourseRequest, IcourseCreateData } from "./course.interface";
+import { ICourseFilterRequest, IcourseCreateData } from "./course.interface";
 
 const prisma = new PrismaClient();
 
@@ -67,7 +67,7 @@ const insertIntoDB = async (data: IcourseCreateData) => {
 
 
 
-const getAll = async (data:ICourseRequest, options: IPaginationOptions):Promise<IGenericResponse<Course[]>> => {
+const getAll = async (data:ICourseFilterRequest, options: IPaginationOptions):Promise<IGenericResponse<Course[]>> => {
     const {searchTerm, ...filterData} = data;
 
     const {limit, page, skip} = paginationHelpers.calculatePagination(options);
@@ -156,46 +156,87 @@ const updateById = async (id: string, payload: Partial<IcourseCreateData>): Prom
 
     const { preRequisiteCourses, ...courseData } = payload;
 
-    const result = await prisma.$transaction(async (tx) => {
+     await prisma.$transaction(async (tx) => {
         const course = await tx.course.update({
             where: {
                 id
             },
-            data: courseData,
-            include: {
-                preRequisite: {
-                    include: {
-                        prerequisite: true
-                    }
-                },
-                preRequisiteFor: {
-                    include: {
-                        course: true
-                    }
-
-                }
-            }
+            data: courseData
 
         })
         
         if (preRequisiteCourses && preRequisiteCourses.length > 0) {
-            for (let i = 0; i < preRequisiteCourses.length; i++) {
-                const createPreRequisite = await tx.courseToPrerequisite.create(
-                    {
-                        data: {
-                            courseId: course.id,
-                            preRequisiteId: preRequisiteCourses[i].courseId
+            const deletePrequisite = preRequisiteCourses.filter((coursePreRequisite) => 
+                coursePreRequisite.courseId && coursePreRequisite.isDeleted
+            );
+
+            const createPrequisite = preRequisiteCourses.filter((coursePreRequisite) =>
+                coursePreRequisite.courseId && !coursePreRequisite.isDeleted
+            );
+
+            console.log(deletePrequisite, "deletePrequisite", createPrequisite, "createPrequisite");
+            
+           
+            if(deletePrequisite.length > 0){
+                for(let i =0; i< deletePrequisite.length; i++){
+                     await tx.courseToPrerequisite.deleteMany({
+                        where: {
+                            AND:[
+                                {
+                                    courseId: id
+                                },
+                                {
+                                    preRequisiteId: deletePrequisite[i].courseId
+                                }
+                            ]
                         }
                     })
-                console.log(createPreRequisite, "createPreRequisite");
-                
+
+                }
+
+        }
+
+        if(createPrequisite.length > 0){
+            for(let i =0; i< createPrequisite.length; i++){
+
+             await tx.courseToPrerequisite.create(
+                    {
+                        data:{
+                            courseId: id,
+                            preRequisiteId: createPrequisite[i].courseId
+                        }
+                    }
+                )
             }
 
         }
+
+
         return course;
+    }
+})
+
+    const response = await prisma.course.findUnique({
+        where: {
+            id
+        },
+        include: {
+            preRequisite: {
+                include: {
+                    prerequisite: true
+                }
+            },
+            preRequisiteFor: {
+                include: {
+                    course: true
+                }
+
+            }
+        }
     })
 
-    return result;
+    return response;
+
 }
 
 const deleteById = async (id: string): Promise<Course | null> => {
