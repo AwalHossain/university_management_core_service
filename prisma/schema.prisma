@@ -66,7 +66,7 @@ model AcademicSemester {
   createdAt            DateTime               @default(now())
   updatedAt            DateTime               @updatedAt
   students             Student[]
-  SemesterRegistration SemesterRegistration[]
+  semesterRegistrations SemesterRegistration[]
 }
 
 model Faculty {
@@ -150,7 +150,7 @@ model SemesterRegistration {
   id                 String                     @id @default(uuid())
   startDate          DateTime
   endDate            DateTime
-  status             SemesterRegistrationStatus
+  status             SemesterRegistrationStatus? @default(UPCOMING)
   minCredit          Int                        @default(0)
   maxCredit          Int                        @default(0)
   createdAt          DateTime                   @default(now())
