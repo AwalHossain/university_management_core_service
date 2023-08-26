@@ -1,0 +1,53 @@
+import { z } from "zod";
+
+
+
+const create = z.object({
+    body: z.object({
+        startDate: z.date().min(new Date(), { message: 'Start date must be in the future' }),
+        endDate: z.date({
+            required_error: 'End date must be greater than start date'
+        }),
+        status: z.enum(['UPCOMING', 'ACTIVE', 'COMPLETED']),
+        minCredit: z.number({
+            required_error: 'Minimum credit is required'
+        }),
+        maxCredit: z.number({
+            required_error: 'Maximum credit is required' 
+        }),
+        createdAt: z.date({}),
+        updatedAt: z.date(),
+        academicSemesterId: z.string({
+            required_error: 'Academic semester id is required'
+        }).uuid(),
+    })
+})
+
+
+const update = z.object({
+    body: z.object({
+        id: z.string().uuid().optional(),
+        startDate: z.date().min(new Date(), { message: 'Start date must be in the future' }).optional(),
+        endDate: z.date({
+          required_error: 'End date must be greater than start date'
+        }).optional(),
+        status: z.enum(['UPCOMING', 'ACTIVE', 'COMPLETED']).optional(),
+        minCredit: z.number({
+          required_error: 'Minimum credit is required'
+        }).optional(),
+        maxCredit: z.number({
+          required_error: 'Maximum credit is required' 
+        }).optional(),
+        createdAt: z.date().optional(),
+        updatedAt: z.date().optional(),
+        academicSemesterId: z.string({
+          required_error: 'Academic semester id is required'
+        }).uuid().optional()
+    })
+})
+
+
+export const SemesterRegistrationValidation = {
+    create,
+    update
+}
