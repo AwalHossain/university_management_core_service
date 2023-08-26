@@ -21,7 +21,7 @@ const searchFilter = (
 
 
 
-const objectFilter = (filterOption: any, relationalFields: any, relationalFieldMapper: any) => {
+const objectFilter = (filterOption: any, relationalFields: string[], relationalFieldMapper: {[key:string]:string}) => {
  const result =   Object.keys(filterOption).map((key) => {
         if(relationalFields.includes(key)){
             return{
