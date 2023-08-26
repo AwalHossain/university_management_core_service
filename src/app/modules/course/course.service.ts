@@ -5,8 +5,9 @@ import ApiError from "../../../errors/ApiError";
 import { paginationHelpers } from "../../../helpers/paginationHelper";
 import { IGenericResponse } from "../../../interfaces/common";
 import { IPaginationOptions } from "../../../interfaces/pagination";
+import { asyncForEach } from "../../../shared/utils";
 import { courseSearchableFields } from "./course.constant";
-import { ICourseFilterRequest, IcourseCreateData } from "./course.interface";
+import { ICourseFilterRequest, IPreRequisiteCourseRequest, IcourseCreateData } from "./course.interface";
 
 const prisma = new PrismaClient();
 
@@ -67,24 +68,24 @@ const insertIntoDB = async (data: IcourseCreateData) => {
 
 
 
-const getAll = async (data:ICourseFilterRequest, options: IPaginationOptions):Promise<IGenericResponse<Course[]>> => {
-    const {searchTerm, ...filterData} = data;
+const getAll = async (data: ICourseFilterRequest, options: IPaginationOptions): Promise<IGenericResponse<Course[]>> => {
+    const { searchTerm, ...filterData } = data;
 
-    const {limit, page, skip} = paginationHelpers.calculatePagination(options);
+    const { limit, page, skip } = paginationHelpers.calculatePagination(options);
 
     const andCondition = [];
 
-    if(searchTerm){
-    const searchResult =  FilterOption.searchFilter(searchTerm, courseSearchableFields);
-    andCondition.push(searchResult);
+    if (searchTerm) {
+        const searchResult = FilterOption.searchFilter(searchTerm, courseSearchableFields);
+        andCondition.push(searchResult);
     }
 
-    if(Object.keys(filterData).length > 0){
+    if (Object.keys(filterData).length > 0) {
         const filterResult = FilterOption.filterCondition(filterData);
         andCondition.push(...filterResult);
     }
 
-    const whereCondition = andCondition.length > 0 ? {AND: andCondition} : {};
+    const whereCondition = andCondition.length > 0 ? { AND: andCondition } : {};
 
     const result = await prisma.course.findMany({
         where: whereCondition,
@@ -93,9 +94,9 @@ const getAll = async (data:ICourseFilterRequest, options: IPaginationOptions):Pr
         orderBy: options.sortBy && options.sortOrder ? {
             [options.sortBy]: options.sortOrder
         }
-        : {
-            createdAt: 'desc'
-        },
+            : {
+                createdAt: 'desc'
+            },
         include: {
             preRequisite: {
                 include: {
@@ -109,15 +110,15 @@ const getAll = async (data:ICourseFilterRequest, options: IPaginationOptions):Pr
 
             }
         }
-    }) 
+    })
 
     const total = await prisma.course.count({
         where: whereCondition
     })
 
-    return{
+    return {
         data: result,
-        meta:{
+        meta: {
             total,
             page,
             limit,
@@ -156,7 +157,7 @@ const updateById = async (id: string, payload: Partial<IcourseCreateData>): Prom
 
     const { preRequisiteCourses, ...courseData } = payload;
 
-     await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx) => {
         const course = await tx.course.update({
             where: {
                 id
@@ -164,9 +165,9 @@ const updateById = async (id: string, payload: Partial<IcourseCreateData>): Prom
             data: courseData
 
         })
-        
+
         if (preRequisiteCourses && preRequisiteCourses.length > 0) {
-            const deletePrequisite = preRequisiteCourses.filter((coursePreRequisite) => 
+            const deletePrequisite = preRequisiteCourses.filter((coursePreRequisite) =>
                 coursePreRequisite.courseId && coursePreRequisite.isDeleted
             );
 
@@ -175,46 +176,46 @@ const updateById = async (id: string, payload: Partial<IcourseCreateData>): Prom
             );
 
             console.log(deletePrequisite, "deletePrequisite", createPrequisite, "createPrequisite");
-            
-           
-            if(deletePrequisite.length > 0){
-                for(let i =0; i< deletePrequisite.length; i++){
-                     await tx.courseToPrerequisite.deleteMany({
+
+
+            if (deletePrequisite.length > 0) {
+             await  asyncForEach(deletePrequisite, async (deletePreRequisite:IPreRequisiteCourseRequest) => {
+                    await tx.courseToPrerequisite.deleteMany({
                         where: {
-                            AND:[
+                            AND: [
                                 {
                                     courseId: id
                                 },
                                 {
-                                    preRequisiteId: deletePrequisite[i].courseId
+                                    preRequisiteId: deletePreRequisite.courseId
                                 }
                             ]
                         }
                     })
+                })
 
-                }
-
-        }
-
-        if(createPrequisite.length > 0){
-            for(let i =0; i< createPrequisite.length; i++){
-
-             await tx.courseToPrerequisite.create(
-                    {
-                        data:{
-                            courseId: id,
-                            preRequisiteId: createPrequisite[i].courseId
-                        }
-                    }
-                )
             }
+
+            if (createPrequisite.length > 0) {
+
+                await asyncForEach(createPrequisite, async (insertPreRequisite) => {
+                    await tx.courseToPrerequisite.create(
+                        {
+                            data: {
+                                courseId: id,
+                                preRequisiteId: insertPreRequisite.courseId
+                            }
+                        }
+                    )
+                })
+            }
+
 
         }
 
 
         return course;
-    }
-})
+    })
 
     const response = await prisma.course.findUnique({
         where: {
@@ -245,7 +246,7 @@ const deleteById = async (id: string): Promise<Course | null> => {
 
         await prisma.courseToPrerequisite.deleteMany({
             where: {
-                OR:[
+                OR: [
                     {
                         courseId: id
                     },
@@ -255,7 +256,7 @@ const deleteById = async (id: string): Promise<Course | null> => {
                 ]
             }
         })
-    
+
         const course = await prisma.course.delete({
             where: {
                 id
