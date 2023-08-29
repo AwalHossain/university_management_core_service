@@ -21,26 +21,39 @@ const searchFilter = (
 
 
 
-const objectFilter = (filterOption: any, relationalFields: string[], relationalFieldMapper: {[key:string]:string}) => {
- const result =   Object.keys(filterOption).map((key) => {
-        if(relationalFields.includes(key)){
-            return{
-                [relationalFieldMapper[key]]: {
-                    id: (filterOption as any) [key]
-                }
-            }
-        }else{
-            return{
-                [key]: {
-                    equals: (filterOption as any)[key]
-                }
-            }
-        }
-    })
+type FilterOption = Record<string, any>;
 
-    return result;
-    
-}
+type RelationalFieldMapper = Record<string, string>;
+
+type Filter = {
+  [key: string]: {
+    equals: any;
+  } | {
+    [key: string]: {
+      id: string;
+    };
+  };
+};
+
+const objectFilter = (filterOption: FilterOption, relationalFields: string[], relationalFieldMapper: RelationalFieldMapper): Filter[] => {
+  const result = Object.keys(filterOption).map((key) => {
+    if (relationalFields.includes(key)) {
+      return {
+        [relationalFieldMapper[key]]: {
+          id: filterOption[key]
+        }
+      };
+    } else {
+      return {
+        [key]: {
+          equals: filterOption[key]
+        }
+      };
+    }
+  });
+
+  return result;
+};
 
 const filterCondition = (filterData: any)=>{
     const result = Object.keys(filterData).map((key) => (
