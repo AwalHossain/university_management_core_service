@@ -125,7 +125,6 @@ const getById = async (id: string): Promise<OfferedCourse | null> => {
 
 
 const updateById = async (id: string, data: Partial<ICreateOfferCourse>): Promise<OfferedCourse | null> => {
-    const { courseIds, academicDepartmentId, semesterRegistrationId } = data;
     const result = await prisma.offeredCourse.update({
         where: {
             id
@@ -159,20 +158,10 @@ const deleteById = async (id: string): Promise<OfferedCourse> => {
 };
 
 
-export const OfferedCourseController = {
+export const OfferedCourseService= {
+    insertIntoDB,
     getAll,
     getById,
     updateById,
     deleteById
-}
-
-
-
-
-
-
-
-
-export const OfferedCourseService = {
-    insertIntoDB
 }
