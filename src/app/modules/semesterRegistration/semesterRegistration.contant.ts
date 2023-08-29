@@ -1,5 +1,5 @@
 
-export const SemesterRegistrationFilterableFields = [ 'searchTerm', 'status' ]
+export const SemesterRegistrationFilterableFields = [ 'searchTerm', 'status', 'academicSemesterId' ]
 
 /**
  * Fields that can be searched for in the semester registration module.
