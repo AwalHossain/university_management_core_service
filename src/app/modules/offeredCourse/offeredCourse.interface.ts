@@ -6,3 +6,11 @@ export type ICreateOfferCourse = {
     academicDepartmentId: string;
     semesterRegistrationId: string;
 }
+
+
+export type IOfferCourseFilterReq = {
+    searchTerm?: string;
+    courseId?: string;
+    academicDepartmentId?: string;
+    semesterRegistrationId?: string;
+}
