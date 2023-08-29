@@ -47,7 +47,9 @@ const getAll = async (filter: IFacultyFilterRequest, options: IPaginationOptions
             take: limit,
             orderBy: options.sortBy && options.sortOrder ? {
                 [options.sortBy]: options.sortOrder
-            } : {},
+            } : {
+                createdAt: 'desc'
+            },
         })
     
         const total = await prisma.faculty.count({
