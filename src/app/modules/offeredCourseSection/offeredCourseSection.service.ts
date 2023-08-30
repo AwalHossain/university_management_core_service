@@ -6,9 +6,9 @@ import { paginationHelpers } from "../../../helpers/paginationHelper";
 import { IGenericResponse } from "../../../interfaces/common";
 import { IPaginationOptions } from "../../../interfaces/pagination";
 import {
-    offeredCourseSectionFilterableFields,
-    offeredCourseSectionRelationFieldsMapper,
-    offeredCourseSectionSearchableFields
+  offeredCourseSectionFilterableFields,
+  offeredCourseSectionRelationFieldsMapper,
+  offeredCourseSectionSearchableFields
 } from "./offeredCourseSection.constant";
 import { IOfferedCourseSectionFilterRequest } from "./offeredCourseSection.interface";
 
@@ -16,17 +16,17 @@ const prisma = new PrismaClient();
 
 const insertIntoDB = async (data: OfferedCourseSection): Promise<OfferedCourseSection> => {
   const { offeredCourseId,  } = data;
-  const existingOfferedCourseSection = await prisma.offeredCourseSection.findFirst({
+  const isExistOfferedCourse = await prisma.offeredCourse.findFirst({
     where: {
      id: offeredCourseId,
     },
   });
 
-  if (!existingOfferedCourseSection) {
-    throw new ApiError(httpStatus.BAD_REQUEST,"OfferedCourseSection not found");
+  if (!isExistOfferedCourse) {
+    throw new ApiError(httpStatus.BAD_REQUEST,"OfferedCourse not found");
 }
 
-data.semesterRegistrationId = existingOfferedCourseSection.semesterRegistrationId;
+data.semesterRegistrationId = isExistOfferedCourse.semesterRegistrationId;
 
 const insertedOfferedCourseSection = await prisma.offeredCourseSection.create({
   data,
