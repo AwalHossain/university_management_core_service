@@ -13,16 +13,16 @@ const create = z.object({
 
             required_error: "End time is required"
         }),
-        facultyId: z.number({
+        facultyId: z.string({
             required_error: "Faculty id is required"
         }),
-        roomId: z.number({
+        roomId: z.string({
             required_error: "Room id is required"
         }),
-        offeredCourseSectionId: z.number({
+        offeredCourseSectionId: z.string({
             required_error: "Offered course section id is required"
         }),
-        semesterRegistrationId: z.number({
+        semesterRegistrationId: z.string({
             required_error: "Semester registration id is required"
         })
     })
