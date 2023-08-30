@@ -1,0 +1,5 @@
+-- CreateEnum
+CREATE TYPE "DAY_OF_WEEK" AS ENUM ('SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY');
+
+-- AlterTable
+ALTER TABLE "offered_course_class_schedules" ADD COLUMN     "dayOfWeek" "DAY_OF_WEEK" NOT NULL DEFAULT 'SATURDAY';
