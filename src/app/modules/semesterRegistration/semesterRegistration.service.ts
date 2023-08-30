@@ -1,4 +1,4 @@
-import { PrismaClient, SemesterRegistration, SemesterRegistrationStatus } from "@prisma/client";
+import { PrismaClient, SemesterRegistration, SemesterRegistrationStatus, StudentSemesterRegistration } from "@prisma/client";
 import httpStatus from "http-status";
 import { FilterOption } from "../../../constants/filterOption";
 import ApiError from "../../../errors/ApiError";
@@ -156,6 +156,81 @@ const deleteById = async (id: string) => {
 }
 
 
+const startMyRegistraion = async (authUserId: string):Promise<{
+    semesterRegistration: SemesterRegistration | null,
+    studentSemesterRegistration: StudentSemesterRegistration | null
+}> => {
+    const studentInfo  = await prisma.student.findFirst({
+        where:{
+            studentId: authUserId
+        }
+    })
+
+    if(!studentInfo) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Student not found')
+    }
+
+    const semesterRegistrationInfo = await prisma.semesterRegistration.findFirst({
+        where: {
+            OR:[
+                {
+                    status: SemesterRegistrationStatus.UPCOMING
+                },
+                {
+                    status: SemesterRegistrationStatus.ONGOING
+                }
+            ]
+        }
+    })
+
+    /**
+     * or you could use $In
+     *  where{
+     *  status: {
+     * in: [SemesterRegistrationStatus.UPCOMING, SemesterRegistrationStatus.ONGOING]
+     * }
+     * }
+     */
+
+    if(semesterRegistrationInfo?.status === SemesterRegistrationStatus.UPCOMING) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Semester registration is not started yet')
+    }
+
+
+    let studentRegistration = await prisma.studentSemesterRegistration.findFirst({
+        where: {
+            student: {
+                id: studentInfo?.id
+            },
+            semesterRegistration: {
+                id: semesterRegistrationInfo?.id
+            }
+        }
+    })
+
+    if(!studentRegistration) {
+        studentRegistration = await prisma.studentSemesterRegistration.create({
+            data: {
+                student: {
+                    connect: {
+                        id: studentInfo?.id
+                    }
+                },
+                semesterRegistration: {
+                    connect: {
+                        id: semesterRegistrationInfo?.id
+                    }
+                }
+            }
+        })
+    }
+
+    return {
+        semesterRegistration: semesterRegistrationInfo,
+        studentSemesterRegistration: studentRegistration
+    }
+}
+
 
 
 export const SemesterRegistrationService = {
@@ -163,5 +238,6 @@ export const SemesterRegistrationService = {
     getAll,
     getById,
     updateById,
-    deleteById
+    deleteById,
+    startMyRegistraion
 }

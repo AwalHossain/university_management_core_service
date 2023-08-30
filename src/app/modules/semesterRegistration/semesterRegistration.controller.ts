@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
 import httpStatus from "http-status";
 import { paginationFields } from "../../../constants/pagination";
@@ -90,6 +91,22 @@ const deleteById = catchAsync(async (req: Request, res: Response) => {
 }
 )
 
+const startMyRegistraion = catchAsync(async (req: Request, res: Response) => {
+    const user = (req as any).user;
+    // console.log(user,'check');
+    
+    const result = await SemesterRegistrationService.startMyRegistraion(user.userId);
+
+    sendResponse(
+        res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "Semester registration fetched successfully",
+        data: result
+    })
+
+})
+
 
 
 
@@ -99,4 +116,5 @@ export const SemesterRegistrationController = {
     getById,
     updateById,
     deleteById,
+    startMyRegistraion
 }
