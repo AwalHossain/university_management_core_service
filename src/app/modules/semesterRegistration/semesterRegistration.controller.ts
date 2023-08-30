@@ -26,7 +26,8 @@ const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
 const getAll = catchAsync(async (req: Request, res: Response) => {
     const filters = pick(req.query, SemesterRegistrationFilterableFields);
     const options = pick(req.query, paginationFields);
-
+    console.log(filters, 'filters, options');
+    
     const result = await SemesterRegistrationService.getAll(filters, options);
 
     sendResponse(

@@ -18,7 +18,7 @@ SemesterRegistrationController.getAll)
 Router.get('/:id',
 SemesterRegistrationController.getById)
 
-Router.put('/:id',
+Router.patch('/:id',
 validateRequest(SemesterRegistrationValidation.update),
 SemesterRegistrationController.updateById)
 

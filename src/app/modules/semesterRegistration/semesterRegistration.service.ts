@@ -1,11 +1,11 @@
-import { PrismaClient, SemesterRegistration } from "@prisma/client";
+import { PrismaClient, SemesterRegistration, SemesterRegistrationStatus } from "@prisma/client";
 import httpStatus from "http-status";
 import { FilterOption } from "../../../constants/filterOption";
 import ApiError from "../../../errors/ApiError";
 import { paginationHelpers } from "../../../helpers/paginationHelper";
 import { IGenericResponse } from "../../../interfaces/common";
 import { IPaginationOptions } from "../../../interfaces/pagination";
-import { SemesterRegistrationRelationalFields, SemesterRegistrationRelationalFieldsMapper, SemesterRegistrationSearchableFields } from "./semesterRegistration.contant";
+import { SemesterRegistrationRelationalFields, SemesterRegistrationRelationalFieldsMapper, semesterRegistrationSearchableFields } from "./semesterRegistration.contant";
 import { ISemesterRegRequest } from "./semesterRegistration.interface";
 
 
@@ -19,17 +19,17 @@ const insertIntoDB = async (data: SemesterRegistration) => {
         where: {
             OR: [
                 {
-                    status: "UPCOMING"
+                    status: SemesterRegistrationStatus.UPCOMING
                 },
                 {
-                    status: "ONGOING"
+                    status: SemesterRegistrationStatus.ONGOING
                 }
             ]
         }
     })
 
     if (isAnySemesterRegUpcomingOrOngoing) {
-        throw new ApiError(httpStatus.BAD_REQUEST, `There is already an ${data.status}  semester registration`)
+        throw new ApiError(httpStatus.BAD_REQUEST, `There is already an ${isAnySemesterRegUpcomingOrOngoing.status}  semester registration`)
     }
 
     return await prisma.semesterRegistration.create({
@@ -45,50 +45,55 @@ const getAll = async (
     options: IPaginationOptions
 ): Promise<IGenericResponse<SemesterRegistration[]>> => {
 
-    const {searchTerm, ...filterData} = filters;
+    const {searchTerm, ...filterOptions} = filters;
     const {limit, skip, page, } = paginationHelpers.calculatePagination(options)
-
+    console.log(filters, filterOptions,'searchTerm, filterData');
+    
     const andConditions = [];
 
     if (searchTerm) {
-        const result = FilterOption.searchFilter(searchTerm, SemesterRegistrationSearchableFields);
-        andConditions.push(result)
+        const lowercaseSearchTerm = searchTerm.toLowerCase();
+        andConditions.push({
+            OR: semesterRegistrationSearchableFields.map((field) => ({
+                [field]:{
+                    in: Object.values(SemesterRegistrationStatus).filter(
+                      (enumValue) => enumValue.toLowerCase().includes(lowercaseSearchTerm)
+                    )
+                  }
+            }))
+        });
     }
-
-    if(Object.keys(filterData).length > 0) {
-        const result = FilterOption.objectFilter(filterData, SemesterRegistrationRelationalFields, SemesterRegistrationRelationalFieldsMapper );
-        andConditions.push(...result)
+  
+    if (Object.keys(filterOptions).length > 0) {
+    const result =   FilterOption.objectFilter(filterOptions, SemesterRegistrationRelationalFields, SemesterRegistrationRelationalFieldsMapper)
+    andConditions.push(...result)
     }
-
-    const whereAndCondition = andConditions.length > 0 ? {
-        AND: andConditions
-    } : {}
-
+  
+    const whereCondition = andConditions.length>0?{ AND: andConditions }:{};
+  
     const result = await prisma.semesterRegistration.findMany({
-        where: {
-            ...whereAndCondition
-        },
-        include: {
-            academicSemester: true
-        },
-        take: limit,
-        skip: skip
-    })
-
-    const total = await prisma.semesterRegistration.count({
-        where: {
-            ...whereAndCondition
+        where: whereCondition,
+        skip,
+        take : limit,
+        orderBy: options.sortOrder && options.sortBy ? {
+            [options.sortBy]: options.sortOrder
+        } : {
+            createdAt: 'desc'
         }
-    })
-
+    });
+  
+    const count = await prisma.semesterRegistration.count({
+      where: whereCondition,
+    });
+  
     return {
-        data: result,
-        meta: {
-            limit,
-            total,
-            page,
-        }
-    }
+      data: result,
+      meta: {
+        total: count,
+        page,
+        limit,
+      },
+    };
 
 }
 
@@ -108,6 +113,25 @@ const getById = async (id: string) => {
 }
 
 const updateById = async (id: string, data: SemesterRegistration) => {
+
+    const isExist = await prisma.semesterRegistration.findUnique({
+        where: {
+            id
+        }
+    })
+
+    if (!isExist) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Semester registration not found')
+    }
+
+    if(isExist.status === SemesterRegistrationStatus.UPCOMING && data.status !== SemesterRegistrationStatus.ONGOING) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Semester registration status can only be changed to ongoing')
+    }
+
+    if(isExist.status === SemesterRegistrationStatus.ONGOING && data.status !== SemesterRegistrationStatus.ENDED) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Semester registration status can only be changed to ended')
+    }
+
     const result = await prisma.semesterRegistration.update({
         where: {
             id

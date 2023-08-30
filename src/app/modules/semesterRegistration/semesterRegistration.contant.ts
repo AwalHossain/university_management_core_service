@@ -4,8 +4,7 @@ export const SemesterRegistrationFilterableFields = [ 'searchTerm', 'status', 'a
 /**
  * Fields that can be searched for in the semester registration module.
  */
-export const SemesterRegistrationSearchableFields = [ 'id', 'status', 'startData', 'endDate' ]
-
+export const semesterRegistrationSearchableFields: string[] = ['academicSemesterId','status'];
 
 
 
