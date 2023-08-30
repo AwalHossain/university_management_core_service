@@ -6,8 +6,12 @@ export const asyncForEach = async <T>(
     array: T[],
     callback: (item: T, index: number, array: T[]) => Promise<void>
 ): Promise<void> => {
-  
-    await Promise.all(array.map(callback));
+    if (!Array.isArray(array)) {
+        throw new Error("Expected an array");
+    }
+    for (let index = 0; index < array.length; index++) {
+        await callback(array[index], index, array)
+    }
 };  
 
 

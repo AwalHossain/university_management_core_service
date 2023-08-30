@@ -1,5 +1,7 @@
 import { OfferedCourse, PrismaClient } from "@prisma/client";
+import httpStatus from "http-status";
 import { FilterOption } from "../../../constants/filterOption";
+import ApiError from "../../../errors/ApiError";
 import { paginationHelpers } from "../../../helpers/paginationHelper";
 import { IGenericResponse } from "../../../interfaces/common";
 import { IPaginationOptions } from "../../../interfaces/pagination";
@@ -9,12 +11,12 @@ import { ICreateOfferCourse, IOfferCourseFilterReq } from "./offeredCourse.inter
 
 const prisma = new PrismaClient();
 
-const insertIntoDB  = (
+const insertIntoDB  = async (
     data: ICreateOfferCourse
 )=> {
         const { courseIds, academicDepartmentId, semesterRegistrationId } = data;   
         const offeredCourses: OfferedCourse[] = [];
-        asyncForEach(courseIds, async (courseId) => {
+      await  asyncForEach(courseIds, async (courseId) => {
             const existingOfferedCourse = await prisma.offeredCourse.findFirst({
                 where: {
                     courseId,
@@ -23,7 +25,8 @@ const insertIntoDB  = (
                 }
 
             });
-
+            console.log(existingOfferedCourse, 'existingOfferedCourse');
+            
             if (!existingOfferedCourse) {
           const insertedCourse =  await prisma.offeredCourse.create({
                     data: {
@@ -41,8 +44,9 @@ const insertIntoDB  = (
             }
 
 
+            console.log(offeredCourses, 'offeredCourses');
         });
-
+        console.log(offeredCourses, 'offeredCourses');
         return offeredCourses;
 }
 
@@ -120,6 +124,11 @@ const getById = async (id: string): Promise<OfferedCourse | null> => {
         }
     });
 
+    if(!result){
+     throw new ApiError(httpStatus.NOT_FOUND, 'OfferedCourse not found');
+    }
+    console.log(result, 'result');
+    
     return result;
 }
 
