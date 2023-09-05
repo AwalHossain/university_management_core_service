@@ -9,3 +9,9 @@ export type ISemesterRegRequest  = {
     academicSemesterId?: string;
 }
 
+
+
+export type IEnrollCousePayload =  {
+    offeredCourseId: string;
+    offeredCourseSectionId: string;
+}
