@@ -239,6 +239,8 @@ const enrollToCourse = async (authUserId: string, payload: IEnrollCousePayload) 
             studentId: authUserId
         }
     })
+    console.log(studentInfo,'studentInfo');
+    
     const semesterRegistrationInfo = await prisma.semesterRegistration.findFirst({
         where: {
             status: SemesterRegistrationStatus.ONGOING
@@ -285,6 +287,8 @@ const enrollToCourse = async (authUserId: string, payload: IEnrollCousePayload) 
             throw new ApiError(httpStatus.BAD_REQUEST, 'Offered course section is full')
         }
 
+ 
+        
 
     await prisma.$transaction(
         async (tx) => {
@@ -292,7 +296,7 @@ const enrollToCourse = async (authUserId: string, payload: IEnrollCousePayload) 
                 data:{
                     studentId: studentInfo?.id,
                     semesterRegistrationId: semesterRegistrationInfo?.id,
-                    courseSectionId: payload.offeredCourseSectionId,
+                    offeredCourseSectionId: payload.offeredCourseSectionId,
                     offeredCourseId: payload.offeredCourseId,
                 }
             })
