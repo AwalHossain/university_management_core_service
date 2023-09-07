@@ -290,7 +290,37 @@ const confirmMyRegistration = async (authUserId: string) => {
         }
 }
 
+const getMyRegistration = async (authUserId: string) => {
+console.log(authUserId,'authUserId');
 
+    const semesterRegistration = await prisma.semesterRegistration.findFirst({
+        where:{
+            status: SemesterRegistrationStatus.ONGOING
+        },
+        include:{
+            academicSemester: true,
+            offeredCourseClassSchedules: true
+        }
+    })
+
+
+    const studentSemesterRegistration = await prisma.studentSemesterRegistration.findFirst({
+        where:{
+           student:{
+            studentId: authUserId,
+           },
+           semesterRegistration:{
+            id: semesterRegistration?.id
+           }
+        },
+        include:{
+            student: true
+        }
+    })    
+    return {
+        semesterRegistration,  studentSemesterRegistration
+    }
+}
 
 
 
@@ -303,5 +333,6 @@ export const SemesterRegistrationService = {
     startMyRegistraion,
     enrollToCourse,
     withdrawCourse,
-    confirmMyRegistration
+    confirmMyRegistration,
+    getMyRegistration
 }
