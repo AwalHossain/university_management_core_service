@@ -59,6 +59,10 @@ Router.post('/confirm-my-registration',
     SemesterRegistrationController.confirmMyRegistration
 )
 
+Router.post(
+    '/:id/start-new-semester',
+    SemesterRegistrationController.startNewSemester
+)
 
 
 
