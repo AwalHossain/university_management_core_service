@@ -9,9 +9,11 @@ export const asyncForEach = async <T>(
     if (!Array.isArray(array)) {
         throw new Error("Expected an array");
     }
-    for (let index = 0; index < array.length; index++) {
-        await callback(array[index], index, array)
-    }
+    const promises = array.map(async (item, index, array) => {
+        await callback(item, index, array);
+      });
+
+    await Promise.all(promises);
 };  
 
 
