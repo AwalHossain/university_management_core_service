@@ -29,6 +29,7 @@ model Student {
   academicSemester                   AcademicSemester                    @relation(fields: [academicSemesterId], references: [id])
   studentSemesterRegistrations       StudentSemesterRegistration[]
   studentSemesterRegistrationCourses StudentSemesterRegistrationCourse[]
+  studenEnrolledCourses               StudenEnrolledCourse[]
 
   @@map("students")
 }
@@ -64,12 +65,14 @@ model AcademicSemester {
   year                  Int
   title                 String
   code                  String
+  isCurrent             Boolean?               @default(false)
   startMonth            String
   endMonth              String
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
   students              Student[]
   semesterRegistrations SemesterRegistration[]
+  studenEnrolledCourses  StudenEnrolledCourse[]
 }
 
 model Faculty {
@@ -121,16 +124,17 @@ model Room {
 }
 
 model Course {
-  id              String                 @id @default(uuid())
-  title           String
-  code            String
-  credits         Int                    @default(0)
-  createdAt       DateTime               @default(now())
-  updatedAt       DateTime               @updatedAt
-  preRequisite    CourseToPrerequisite[] @relation("CourseToPrerequisite")
-  preRequisiteFor CourseToPrerequisite[] @relation("PrerequisiteToCourse")
-  faculties       CourseToFaculty[]
-  offeredCourses  OfferedCourse[]
+  id                   String                 @id @default(uuid())
+  title                String
+  code                 String
+  credits              Int                    @default(0)
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  preRequisite         CourseToPrerequisite[] @relation("CourseToPrerequisite")
+  preRequisiteFor      CourseToPrerequisite[] @relation("PrerequisiteToCourse")
+  faculties            CourseToFaculty[]
+  offeredCourses       OfferedCourse[]
+  studenEnrolledCourses StudenEnrolledCourse[]
 }
 
 model CourseToPrerequisite {
@@ -274,4 +278,30 @@ model StudentSemesterRegistrationCourse {
 
   @@id([semesterRegistrationId, studentId, offeredCourseId])
   @@map("student_semester_registration_courses")
+}
+
+model StudenEnrolledCourse {
+  id                 String           @id @default(uuid())
+  studentId          String
+  student            Student          @relation(fields: [studentId], references: [id])
+  courseId           String
+  course             Course           @relation(fields: [courseId], references: [id])
+  academicSemesterId String
+  academicSemester   AcademicSemester @relation(fields: [academicSemesterId], references: [id])
+
+  grade      String?
+  point      Int?                         @default(0)
+  totalMarks Int?                         @default(0)
+  status     StudentEnrolledCourseStatus? @default(ONGOING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("student_enrolled_courses")
+}
+
+enum StudentEnrolledCourseStatus {
+  ONGOING
+  COMPLETED
+  FAILED
 }
