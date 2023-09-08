@@ -38,8 +38,6 @@ const createPayment = async (
             data: dataToInsert
         })
         console.log(result, 'result');
-        
-
     }
 }
 

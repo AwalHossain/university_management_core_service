@@ -6,6 +6,7 @@ import { paginationHelpers } from "../../../helpers/paginationHelper";
 import { IGenericResponse } from "../../../interfaces/common";
 import { IPaginationOptions } from "../../../interfaces/pagination";
 import { asyncForEach } from "../../../shared/utils";
+import { StudentEnrolledCourseMarkService } from "../studentEnrolledCourseMark/StudentEnrolledCourseMark.service";
 import { StudentSemesterPaymentService } from "../studentSemesterPayment/studentSemesterPayment.service";
 import { StudentSemesterRegistrationCourseService } from "../studentSemesterRegistrationCourse/StudentSemesterRegistrationCourse.service";
 import { SemesterRegistrationRelationalFields, SemesterRegistrationRelationalFieldsMapper, semesterRegistrationSearchableFields } from "./semesterRegistration.contant";
@@ -429,11 +430,19 @@ await asyncForEach(studentSemesterRegistrations, async (studentSemReg: StudentSe
         courseId: item.offeredCourse.courseId,
       };
 
-   const result =   await tx.studenEnrolledCourse.create({
+   const studentEnrolledCourseData =   await tx.studenEnrolledCourse.create({
         data: enrollData,
       });
-      console.log(result,'result');
+
+      await StudentEnrolledCourseMarkService.createStudentEnrolledCourseDefaultMark(
+          tx,{
+          studentId: item.studentId,
+          studentEnrolledId: studentEnrolledCourseData?.id,
+          academicSemesterId: semesterRegistration.academicSemesterId,
+          }
+      )
     }
+
     
   });
 });
