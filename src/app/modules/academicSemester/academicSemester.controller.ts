@@ -27,7 +27,7 @@ const getAll= catchAsync(async (req: Request, res: Response) => {
     const filter = pick(req.query, academicFacultyFilterableFields);
     const options = pick(req.query, paginationFields);
 
-    const result = await AcademicFacultyService.getAll(filter, options);
+    const result = await academicSemesterService.getAll(filter, options);
 
     sendResponse(res,{
         success: true,
