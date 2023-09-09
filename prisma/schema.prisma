@@ -31,7 +31,8 @@ model Student {
   studentSemesterRegistrationCourses StudentSemesterRegistrationCourse[]
   studenEnrolledCourses              StudenEnrolledCourse[]
   studentSemesterPayments            StudentSemesterPayment[]
-  studentEnrolledCourseMarks          StudentEnrolledCourseMark[]
+  studentEnrolledCourseMarks         StudentEnrolledCourseMark[]
+  AcademicInfo                       AcademicInfo[]
 
   @@map("students")
 }
@@ -63,19 +64,19 @@ model AcademicDepartment {
 }
 
 model AcademicSemester {
-  id                        String                      @id @default(uuid())
-  year                      Int
-  title                     String
-  code                      String
-  isCurrent                 Boolean?                    @default(false)
-  startMonth                String
-  endMonth                  String
-  createdAt                 DateTime                    @default(now())
-  updatedAt                 DateTime                    @updatedAt
-  students                  Student[]
-  semesterRegistrations     SemesterRegistration[]
-  studenEnrolledCourses     StudenEnrolledCourse[]
-  studentSemesterPayments   StudentSemesterPayment[]
+  id                         String                      @id @default(uuid())
+  year                       Int
+  title                      String
+  code                       String
+  isCurrent                  Boolean?                    @default(false)
+  startMonth                 String
+  endMonth                   String
+  createdAt                  DateTime                    @default(now())
+  updatedAt                  DateTime                    @updatedAt
+  students                   Student[]
+  semesterRegistrations      SemesterRegistration[]
+  studenEnrolledCourses      StudenEnrolledCourse[]
+  studentSemesterPayments    StudentSemesterPayment[]
   studentEnrolledCourseMarks StudentEnrolledCourseMark[]
 }
 
@@ -298,8 +299,8 @@ model StudenEnrolledCourse {
   totalMarks Int?                         @default(0)
   status     StudentEnrolledCourseStatus? @default(ONGOING)
 
-  createdAt                 DateTime                    @default(now())
-  updatedAt                 DateTime                    @updatedAt
+  createdAt                  DateTime                    @default(now())
+  updatedAt                  DateTime                    @updatedAt
   studentEnrolledCourseMarks StudentEnrolledCourseMark[]
 
   @@map("student_enrolled_courses")
@@ -348,6 +349,19 @@ model StudentEnrolledCourseMark {
   marks Int?
 
   exampType ExamType? @default(MIDTERM)
+}
+
+model AcademicInfo {
+  id        String   @id @default(uuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  totalCompletedCredit Int?   @default(0)
+  cgpa                 Float? @default(0)
+
+  @@map("academic_info")
 }
 
 enum ExamType {
