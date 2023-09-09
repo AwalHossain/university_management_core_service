@@ -10,13 +10,7 @@ const create = z.object({
           }),
           maxCapacity: z.number().int().positive({
             message: "Max capacity must be a positive integer",
-          }),
-          currentlyEnrolledStudent: z.number().int().positive({
-            message: "Currently enrolled student must be a positive integer",
-          }),
-            semesterRegistrationId: z.string().nonempty({
-                message: "Semester registration id is required",
-                }),
+          })
     })
 });
 
