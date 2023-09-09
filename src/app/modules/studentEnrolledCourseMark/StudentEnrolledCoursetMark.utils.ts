@@ -1,3 +1,4 @@
+import { Course, StudenEnrolledCourse } from "@prisma/client";
 
 type IR = {
     grade: string,
@@ -44,7 +45,35 @@ const getGrade = (mark: number):IR => {
 
 }
 
+const calcCGPA = (paload: (StudenEnrolledCourse & {course: Course})[])=>{
+
+    if(paload.length === 0){
+        return {
+            totalCompletedCredit: 0,
+            cgpa: 0
+        };
+    }
+
+    let totalCredit = 0;
+    let totalCGPA = 0;
+
+    paload.forEach((item)=>{
+        totalCredit += item.course.credits || 0;
+        totalCGPA += item.point || 0;
+})
+
+const avgCGPA = Number((totalCGPA / paload.length).toFixed(2));
+
+
+    return {
+        totalCompletedCredit: totalCredit,
+        cgpa: avgCGPA
+    }
+}
+
+
 
 export const StudentEnrolledCourseMarkUtils = {
-    getGrade
+    getGrade,
+    calcCGPA
 }

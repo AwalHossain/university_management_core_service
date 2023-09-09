@@ -192,7 +192,7 @@ const updateFinalMarks = async (payload:Partial<IUpdateMarkPayload>)=>{
 
     
 
-    const update =  await prisma.studenEnrolledCourse.updateMany({
+   await prisma.studenEnrolledCourse.updateMany({
         where:{
             id: isExist?.id
         },
@@ -205,9 +205,57 @@ const updateFinalMarks = async (payload:Partial<IUpdateMarkPayload>)=>{
         }
     })
 
+    const grades = await prisma.studenEnrolledCourse.findMany({
+        where:{
+            student: {
+                id: studentId
+            },
+            status: StudentEnrolledCourseStatus.COMPLETED
+        },
+        include:{
+            course: true
+        }
+    })
+
+    const academicResult  = StudentEnrolledCourseMarkUtils.calcCGPA(grades)
+
+
+    const studentAcademicInfo = await prisma.academicInfo.findFirst({
+        where: {
+            student: {
+                id: studentId
+            }
+        }
+    })
+
+    if (studentAcademicInfo) {
+        await prisma.academicInfo.update({
+            where: {
+                id: studentAcademicInfo.id
+            },
+            data: {
+                cgpa: academicResult.cgpa,
+                totalCompletedCredit: academicResult.totalCompletedCredit
+            }
+        })
+    } else {
+        await prisma.academicInfo.create({
+            data: {
+                student: {
+                    connect: {
+                        id: studentId
+                    }
+                },
+                cgpa: academicResult.cgpa,
+                totalCompletedCredit: academicResult.totalCompletedCredit
+            }
+        })
+    }
+
+
 
     
-    return update
+    return grades;
 }
 
 
