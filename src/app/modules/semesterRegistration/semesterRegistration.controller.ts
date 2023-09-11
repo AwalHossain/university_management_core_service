@@ -28,7 +28,7 @@ const getAll = catchAsync(async (req: Request, res: Response) => {
     const filters = pick(req.query, SemesterRegistrationFilterableFields);
     const options = pick(req.query, paginationFields);
     console.log(filters, 'filters, options');
-    
+
     const result = await SemesterRegistrationService.getAll(filters, options);
 
     sendResponse(
@@ -94,7 +94,7 @@ const deleteById = catchAsync(async (req: Request, res: Response) => {
 const startMyRegistraion = catchAsync(async (req: Request, res: Response) => {
     const user = (req as any).user;
     // console.log(user,'check');
-    
+
     const result = await SemesterRegistrationService.startMyRegistraion(user.userId);
 
     sendResponse(
@@ -126,7 +126,7 @@ const enrollCourse = catchAsync(async (req: Request, res: Response) => {
 )
 
 
- const withdrawCourse = catchAsync(async (req: Request, res: Response) => {
+const withdrawCourse = catchAsync(async (req: Request, res: Response) => {
     const user = (req as any).user;
 
     const result = await SemesterRegistrationService.withdrawCourse(user.userId, req.body);
@@ -158,10 +158,10 @@ const confirmMyRegistration = catchAsync(async (req: Request, res: Response) => 
 })
 
 
-const getMyRegistration  = catchAsync(async (req: Request, res: Response) => {
+const getMyRegistration = catchAsync(async (req: Request, res: Response) => {
     const user = (req as any).user;
     const result = await SemesterRegistrationService.getMyRegistration(user?.userId);
-    
+
     sendResponse(
         res, {
         success: true,
@@ -174,7 +174,7 @@ const getMyRegistration  = catchAsync(async (req: Request, res: Response) => {
 
 const startNewSemester = catchAsync(async (req: Request, res: Response) => {
 
-    const {id} = req.params;
+    const { id } = req.params;
 
     const result = await SemesterRegistrationService.startNewSemester(id);
 
@@ -183,6 +183,22 @@ const startNewSemester = catchAsync(async (req: Request, res: Response) => {
         success: true,
         statusCode: httpStatus.OK,
         message: 'start new semester sucess',
+        data: result
+    })
+
+})
+
+const getMySemesterRegCourse = catchAsync(async (req: Request, res: Response) => {
+    const user = (req as any).user;
+
+    const result = await SemesterRegistrationService.getMySemesterRegCourse(user?.userId);
+    console.log(result, 'result');
+
+    sendResponse(
+        res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: 'Semester Registraion course retrieved successfully',
         data: result
     })
 
@@ -200,5 +216,6 @@ export const SemesterRegistrationController = {
     withdrawCourse,
     confirmMyRegistration,
     getMyRegistration,
-    startNewSemester
+    startNewSemester,
+    getMySemesterRegCourse
 }

@@ -15,23 +15,28 @@ Router.get('/get-my-registration',
     SemesterRegistrationController.getMyRegistration
 )
 
+Router.get('/semester-reg-course',
+
+    auth(ENUM_USER_ROLE.STUDENT),
+    SemesterRegistrationController.getMySemesterRegCourse
+)
 
 Router.post('/',
-validateRequest(SemesterRegistrationValidation.create),
-SemesterRegistrationController.insertIntoDB)
+    validateRequest(SemesterRegistrationValidation.create),
+    SemesterRegistrationController.insertIntoDB)
 
 Router.get('/',
-SemesterRegistrationController.getAll)
+    SemesterRegistrationController.getAll)
 
 Router.get('/:id',
-SemesterRegistrationController.getById)
+    SemesterRegistrationController.getById)
 
 Router.patch('/:id',
-validateRequest(SemesterRegistrationValidation.update),
-SemesterRegistrationController.updateById)
+    validateRequest(SemesterRegistrationValidation.update),
+    SemesterRegistrationController.updateById)
 
 Router.delete('/:id',
-SemesterRegistrationController.deleteById)
+    SemesterRegistrationController.deleteById)
 
 Router.post(
     '/start-my-registration',
@@ -63,6 +68,8 @@ Router.post(
     '/:id/start-new-semester',
     SemesterRegistrationController.startNewSemester
 )
+
+
 
 
 

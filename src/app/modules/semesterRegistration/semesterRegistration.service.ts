@@ -11,6 +11,7 @@ import { StudentSemesterPaymentService } from "../studentSemesterPayment/student
 import { StudentSemesterRegistrationCourseService } from "../studentSemesterRegistrationCourse/StudentSemesterRegistrationCourse.service";
 import { SemesterRegistrationRelationalFields, SemesterRegistrationRelationalFieldsMapper, semesterRegistrationSearchableFields } from "./semesterRegistration.contant";
 import { IEnrollCousePayload, ISemesterRegRequest } from "./semesterRegistration.interface";
+import { SemesterRegistrationUtils } from "./semesterRegistration.utils";
 
 
 const prisma = new PrismaClient();
@@ -367,91 +368,183 @@ const startNewSemester = async (id: string) => {
             }
         })
 
-    const studentSemesterRegistrations = await tx.studentSemesterRegistration.findMany({
-  where: {
-    semesterRegistrationId: semesterRegistration.id,
-    isConfirmed: true,
-  },
-});
+        const studentSemesterRegistrations = await tx.studentSemesterRegistration.findMany({
+            where: {
+                semesterRegistrationId: semesterRegistration.id,
+                isConfirmed: true,
+            },
+        });
 
-console.log(studentSemesterRegistrations, 'studentSemesterRegistrations');
+        console.log(studentSemesterRegistrations, 'studentSemesterRegistrations');
 
 
-await asyncForEach(studentSemesterRegistrations, async (studentSemReg: StudentSemesterRegistration) => {
-  if (studentSemReg.totalCredit) {
-    const totalSemesterPayment = studentSemReg.totalCredit * 5000;
-    await StudentSemesterPaymentService.createPayment(
-      tx,
-      {
-        studentId: studentSemReg.studentId,
-        academicSemesterId: semesterRegistration.academicSemesterId,
-        totalPaymentAmount: totalSemesterPayment,
-      }
-    );
-  }
+        await asyncForEach(studentSemesterRegistrations, async (studentSemReg: StudentSemesterRegistration) => {
+            if (studentSemReg.totalCredit) {
+                const totalSemesterPayment = studentSemReg.totalCredit * 5000;
+                await StudentSemesterPaymentService.createPayment(
+                    tx,
+                    {
+                        studentId: studentSemReg.studentId,
+                        academicSemesterId: semesterRegistration.academicSemesterId,
+                        totalPaymentAmount: totalSemesterPayment,
+                    }
+                );
+            }
 
-  const studentSemesterRegistrationCourse = await tx.studentSemesterRegistrationCourse.findMany({
-    where: {
-      semesterRegistrationId: semesterRegistration.id,
-      studentId: studentSemReg.studentId,
-    },
-    include: {
-      offeredCourse: {
-        include: {
-          course: true,
-        },
-      },
-    },
-  });
+            const studentSemesterRegistrationCourse = await tx.studentSemesterRegistrationCourse.findMany({
+                where: {
+                    semesterRegistrationId: semesterRegistration.id,
+                    studentId: studentSemReg.studentId,
+                },
+                include: {
+                    offeredCourse: {
+                        include: {
+                            course: true,
+                        },
+                    },
+                },
+            });
 
-  console.log('checking', studentSemesterRegistrationCourse);
+            console.log('checking', studentSemesterRegistrationCourse);
 
-  await asyncForEach(studentSemesterRegistrationCourse, async (
-    item: StudentSemesterRegistrationCourse & {
-      offeredCourse: OfferedCourse & {
-        course: Course,
-      },
-    }
-  ) => {
-    console.log('checking');
-    
-    const isExistEnrolledData = await tx.studenEnrolledCourse.findFirst({
-      where: {
-        studentId: item.studentId,
-        academicSemesterId: semesterRegistration.academicSemesterId,
-        courseId: item.offeredCourse.courseId,
-      },
-    });
+            await asyncForEach(studentSemesterRegistrationCourse, async (
+                item: StudentSemesterRegistrationCourse & {
+                    offeredCourse: OfferedCourse & {
+                        course: Course,
+                    },
+                }
+            ) => {
+                console.log('checking');
 
-    if (!isExistEnrolledData) {
-      const enrollData = {
-        studentId: item.studentId,
-        academicSemesterId: semesterRegistration.academicSemesterId,
-        courseId: item.offeredCourse.courseId,
-      };
+                const isExistEnrolledData = await tx.studenEnrolledCourse.findFirst({
+                    where: {
+                        studentId: item.studentId,
+                        academicSemesterId: semesterRegistration.academicSemesterId,
+                        courseId: item.offeredCourse.courseId,
+                    },
+                });
 
-   const studentEnrolledCourseData =   await tx.studenEnrolledCourse.create({
-        data: enrollData,
-      });
+                if (!isExistEnrolledData) {
+                    const enrollData = {
+                        studentId: item.studentId,
+                        academicSemesterId: semesterRegistration.academicSemesterId,
+                        courseId: item.offeredCourse.courseId,
+                    };
 
-      await StudentEnrolledCourseMarkService.createStudentEnrolledCourseDefaultMark(
-          tx,{
-          studentId: item.studentId,
-          studentEnrolledId: studentEnrolledCourseData?.id,
-          academicSemesterId: semesterRegistration.academicSemesterId,
-          }
-      )
-    }
+                    const studentEnrolledCourseData = await tx.studenEnrolledCourse.create({
+                        data: enrollData,
+                    });
 
-    
-  });
-});
+                    await StudentEnrolledCourseMarkService.createStudentEnrolledCourseDefaultMark(
+                        tx, {
+                        studentId: item.studentId,
+                        studentEnrolledId: studentEnrolledCourseData?.id,
+                        academicSemesterId: semesterRegistration.academicSemesterId,
+                    }
+                    )
+                }
+
+
+            });
+        });
 
     })
     return {
         message: "Semester started successfully!"
     }
 
+}
+
+
+const getMySemesterRegCourse = async (authUserId: string) => {
+    const studentInfo = await prisma.student.findFirst({
+        where: {
+            id: authUserId
+        }
+    })
+
+    const semesterRegistrationInfo = await prisma.semesterRegistration.findFirst({
+        where: {
+            status: {
+                in: [SemesterRegistrationStatus.ONGOING, SemesterRegistrationStatus.UPCOMING]
+            }
+        }
+    })
+
+    if (!semesterRegistrationInfo) {
+        throw new ApiError(httpStatus.NOT_FOUND, 'Semester registration not found')
+    }
+
+    const completedCourse = await prisma.studenEnrolledCourse.findMany({
+        where: {
+            status: "COMPLETED",
+            student: {
+                id: studentInfo?.id
+            },
+            academicSemester: {
+                id: studentInfo?.academicSemesterId
+            }
+        },
+    })
+
+    const studentCurrentSemesterTakenCourse = await prisma.studentSemesterRegistrationCourse.findMany({
+        where: {
+            studentId: studentInfo?.id,
+            semesterRegistration: {
+                id: semesterRegistrationInfo?.id
+            }
+        },
+        include: {
+            offeredCourse: true,
+            offeredCourseSection: true
+        }
+    })
+
+    const offeredCourse = await prisma.offeredCourse.findMany({
+        where: {
+            semesterRegistration: {
+                id: semesterRegistrationInfo?.id
+            },
+            academicDepartment: {
+                id: studentInfo?.academicDepartmentId
+            }
+        },
+        include: {
+            course: {
+                include: {
+                    preRequisite: {
+                        include: {
+                            prerequisite: {
+                                include: {
+                                    preRequisiteFor: true
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            offeredCourseSections: {
+                include: {
+                    offeredCourseClassSchedules: {
+                        include: {
+                            room: {
+                                include: {
+                                    building: true
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+
+
+        }
+    })
+
+    const availableCourseList = await SemesterRegistrationUtils.getAvailableCourse(completedCourse, studentCurrentSemesterTakenCourse, offeredCourse);
+
+    return availableCourseList;
 }
 
 
@@ -467,5 +560,6 @@ export const SemesterRegistrationService = {
     withdrawCourse,
     confirmMyRegistration,
     getMyRegistration,
-    startNewSemester
+    startNewSemester,
+    getMySemesterRegCourse
 }
