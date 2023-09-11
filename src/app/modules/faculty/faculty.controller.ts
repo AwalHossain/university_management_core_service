@@ -53,8 +53,25 @@ const getById = catchAsync(async (req: Request, res: Response) => {
     });
 
 
+    const getMyCourse = catchAsync(async (req: Request, res: Response) => {
+        const user = (req as any).user;
+        const filter = pick(req.query, ['academicSemesterId', 'courseId']);
+
+        const result = await FacultyService.getMyCourse(user?.userId, filter);
+
+        sendResponse(res,{
+            success: true,
+            data: result,
+            message: 'fauclty data fetched successfully',
+            statusCode: httpStatus.OK
+        })
+
+    });
+    
+
 export const FacultyController = {
     insertIntoDB,
     getAll,
-    getById
+    getById,
+    getMyCourse
 }
