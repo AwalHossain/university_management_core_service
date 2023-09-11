@@ -101,7 +101,7 @@ const startMyRegistraion = catchAsync(async (req: Request, res: Response) => {
         res, {
         success: true,
         statusCode: httpStatus.OK,
-        message: "Semester registration fetched successfully",
+        message: "Semester registration sucess",
         data: result
     })
 
