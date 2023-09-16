@@ -37,11 +37,6 @@ const getAll = async (filter: IAcademicDepartmentFilterRequest,
         andConditon.push(search)
     }
 
-
-
-    //   now here i want merge the search inside andConditon array
-
-
     if (Object.keys(filterOptions).length > 0) {
         const result = FilterOption.objectFilter(filterOptions, academicDepartmentRelationalFields, academicDepartmentRelationalFieldsMapper);
         andConditon.push(...result)
@@ -68,8 +63,6 @@ const getAll = async (filter: IAcademicDepartmentFilterRequest,
         where: whereCondition
     })
 
-
-
     return {
         meta: {
             limit,
@@ -94,8 +87,35 @@ const getById = async (id: string): Promise<AcademicDepartment | null> => {
 }
 
 
+const updateById = async (id: string, data: Partial<AcademicDepartment>): Promise<AcademicDepartment | null> => {
+    const result = await prisma.academicDepartment.update({
+        where: {
+            id
+        },
+        data,
+        include: {
+            academicFaculty: true
+        }
+    })
+    return result;
+}
+
+const deleteById = async (id: string): Promise<AcademicDepartment | null> => {
+    const result = await prisma.academicDepartment.delete({
+        where: {
+            id
+        },
+        include: {
+            academicFaculty: true
+        }
+    })
+    return result;
+}
+
 export const academicDepartmentService = {
     insertIntoDB,
     getAll,
-    getById
+    getById,
+    updateById,
+    deleteById
 }

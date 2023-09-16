@@ -6,17 +6,26 @@ const router = Router();
 
 
 
-router.get('/', 
-academicDepartmentController.getAll
+router.get('/',
+    academicDepartmentController.getAll
 );
 
-router.get('/:id', 
-academicDepartmentController.getById
+router.get('/:id',
+    academicDepartmentController.getById
 );
 
 
 router.post('/',
-academicDepartmentController.insertIntoDB
+    academicDepartmentController.insertIntoDB
+)
+
+router.patch('/:id',
+    academicDepartmentController.updateById
+)
+
+
+router.delete('/:id',
+    academicDepartmentController.deleteById
 )
 
 
