@@ -87,6 +87,17 @@ const updateById = async (id: string, data: AcademicSemester): Promise<AcademicS
     return result;
 }
 
+const deleteById = async (id: string): Promise<AcademicSemester> => {
+    const result = await prisma.academicSemester.delete({
+        where: {
+            id
+        }
+    })
+    return result;
+}
+
+
+
 
 
 
@@ -95,4 +106,5 @@ export const academicSemesterService = {
     getAll,
     getById,
     updateById,
+    deleteById
 }
