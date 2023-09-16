@@ -45,12 +45,13 @@ const moduleRoutes = [
   {
     path: '/student',
     routes: studentRoutes
-  },{
+  },
+  {
     path: '/course',
     routes: courseRoute
   },
   {
-    path: '/building',
+    path: '/buildings',
     routes: buildingRoutes
   },
   {
