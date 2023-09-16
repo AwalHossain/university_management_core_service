@@ -16,7 +16,7 @@ const insertIntoDB = async (data: AcademicFaculty): Promise<AcademicFaculty> => 
     const result = await prisma.academicFaculty.create({
         data,
     },
-    
+
     )
     return result;
 }
@@ -28,21 +28,13 @@ const getAll = async (filter: IAcademicFacultyFilterRequest, options: IPaginatio
     const { searchTerm, ...filterOptions } = filter;
     const andCondition = [];
     if (searchTerm) {
-        const search =  FilterOption.searchFilter(searchTerm, academicFacultySearchableFields);
+        const search = FilterOption.searchFilter(searchTerm, academicFacultySearchableFields);
         andCondition.push(search)
     }
 
     if (Object.keys(filterOptions).length > 0) {
-        andCondition.push({
-            AND: Object.keys(filterOptions).map((key) => {
-                return {
-                    [key]: {
-                        equals: (filterOptions as any)[key]
-                    }
-                }
-            })
-        }
-        )
+        const result = FilterOption.filterCondition(filterOptions);
+        andCondition.push(...result);
     }
 
     const whereCondition = andCondition.length > 0 ? { AND: andCondition } : {};
@@ -62,7 +54,7 @@ const getAll = async (filter: IAcademicFacultyFilterRequest, options: IPaginatio
 
     return {
         data: result,
-        meta:{
+        meta: {
             total,
             page,
             limit,
@@ -81,9 +73,33 @@ const getById = async (id: string): Promise<AcademicFaculty | null> => {
     return result;
 }
 
+const updateById = async (id: string, data: AcademicFaculty): Promise<AcademicFaculty | null> => {
+
+    const result = await prisma.academicFaculty.update({
+        where: {
+            id
+        },
+        data
+    })
+    return result;
+}
+
+const deleteById = async (id: string): Promise<AcademicFaculty | null> => {
+
+    const result = await prisma.academicFaculty.delete({
+        where: {
+            id
+        }
+    })
+    return result;
+}
+
+
 
 export const AcademicFacultyService = {
     insertIntoDB,
     getAll,
-    getById
+    getById,
+    updateById,
+    deleteById,
 }

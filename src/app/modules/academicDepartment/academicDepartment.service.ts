@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AcademicDepartment, PrismaClient } from '@prisma/client';
-import searchFilter from '../../../constants/filterOption';
+import { FilterOption } from '../../../constants/filterOption';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
@@ -31,44 +31,22 @@ const getAll = async (filter: IAcademicDepartmentFilterRequest,
 
     const andConditon = [];
 
-    let search = {};
 
     if (searchTerm) {
-        search = searchFilter(searchTerm, academicDepartmentSearchableFields);
+        const search = FilterOption.searchFilter(searchTerm, academicDepartmentSearchableFields);
+        andConditon.push(search)
     }
 
-    andConditon.push(search)
 
 
     //   now here i want merge the search inside andConditon array
 
-    andConditon.push(search);
 
     if (Object.keys(filterOptions).length > 0) {
-        andConditon.push(
-            {
-                AND: Object.keys(filterOptions).map((key) => {
-                    if (academicDepartmentRelationalFields.includes(key)) {
-                        return {
-                            [academicDepartmentRelationalFieldsMapper[key]]: {
-                                id: (filterOptions as any)[key]
-                            }
-                        }
-                    } else {
-                        return {
-                            [key]: {
-                                equals: (filterOptions as any)[key]
-                            }
-                        }
-                    }
-                })
-            }
-        )
+        const result = FilterOption.objectFilter(filterOptions, academicDepartmentRelationalFields, academicDepartmentRelationalFieldsMapper);
+        andConditon.push(...result)
     }
-
     const whereCondition = andConditon.length > 0 ? { AND: andConditon } : {};
-
-
 
     const result = await prisma.academicDepartment.findMany({
         include: {

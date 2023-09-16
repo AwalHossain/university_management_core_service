@@ -7,10 +7,10 @@ import sendResponse from "../../../shared/sendResponse";
 import { academicFacultyFilterableFields } from "./academicFaculty.constant";
 import { AcademicFacultyService } from "./academicFaculty.service";
 
-const insertIntoDB = catchAsync(async (req:Request, res:Response) => {
+const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
     const result = await AcademicFacultyService.insertIntoDB(req.body);
 
-    sendResponse(res,{
+    sendResponse(res, {
         success: true,
         data: result,
         message: 'Data inserted successfully',
@@ -22,13 +22,13 @@ const insertIntoDB = catchAsync(async (req:Request, res:Response) => {
 
 
 
-const getAll= catchAsync(async (req: Request, res: Response) => {
+const getAll = catchAsync(async (req: Request, res: Response) => {
     const filter = pick(req.query, academicFacultyFilterableFields);
     const options = pick(req.query, paginationFields);
 
     const result = await AcademicFacultyService.getAll(filter, options);
 
-    sendResponse(res,{
+    sendResponse(res, {
         success: true,
         data: result,
         message: 'Data fetched successfully',
@@ -41,21 +41,50 @@ const getAll= catchAsync(async (req: Request, res: Response) => {
 
 
 const getById = catchAsync(async (req: Request, res: Response) => {
-        
-        const result = await AcademicFacultyService.getById(req.params.id);
-    
-        sendResponse(res,{
-            success: true,
-            data: result,
-            message: 'Data fetched successfully',
-            statusCode: httpStatus.OK
-        })
-    
-    });
+
+    const result = await AcademicFacultyService.getById(req.params.id);
+
+    sendResponse(res, {
+        success: true,
+        data: result,
+        message: 'Data fetched successfully',
+        statusCode: httpStatus.OK
+    })
+
+});
+
+
+const updateById = catchAsync(async (req: Request, res: Response) => {
+    const result = await AcademicFacultyService.updateById(req.params.id, req.body);
+
+    sendResponse(res, {
+        success: true,
+        data: result,
+        message: 'Data updated successfully',
+        statusCode: httpStatus.OK
+    })
+
+});
+
+const deleteById = catchAsync(async (req: Request, res: Response) => {
+    const result = await AcademicFacultyService.deleteById(req.params.id);
+
+    sendResponse(res, {
+        success: true,
+        data: result,
+        message: 'Data deleted successfully',
+        statusCode: httpStatus.OK
+    })
+
+});
+
+
 
 
 export const AcademicFacultyController = {
-    insertIntoDB,  
+    insertIntoDB,
     getAll,
-    getById
+    getById,
+    updateById,
+    deleteById,
 }
