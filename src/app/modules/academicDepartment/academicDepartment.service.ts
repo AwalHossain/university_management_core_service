@@ -4,7 +4,8 @@ import { FilterOption } from '../../../constants/filterOption';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
-import { academicDepartmentRelationalFields, academicDepartmentRelationalFieldsMapper, academicDepartmentSearchableFields } from './academicDepartment.constant';
+import { RedisClient } from '../../../shared/redis';
+import { EVENT_ACADEMIC_DEPARTMENT_CREATED, EVENT_ACADEMIC_DEPARTMENT_DELETED, EVENT_ACADEMIC_DEPARTMENT_UPDATED, academicDepartmentRelationalFields, academicDepartmentRelationalFieldsMapper, academicDepartmentSearchableFields } from './academicDepartment.constant';
 import { IAcademicDepartmentFilterRequest } from './academicDepartment.interface';
 
 const prisma = new PrismaClient();
@@ -16,6 +17,11 @@ const insertIntoDB = async (data: AcademicDepartment) => {
             academicFaculty: true
         }
     })
+
+    if (result) {
+        RedisClient.publish(EVENT_ACADEMIC_DEPARTMENT_CREATED, JSON.stringify(result));
+    }
+
     return result;
 }
 
@@ -97,6 +103,12 @@ const updateById = async (id: string, data: Partial<AcademicDepartment>): Promis
             academicFaculty: true
         }
     })
+
+    if (result) {
+        RedisClient.publish(EVENT_ACADEMIC_DEPARTMENT_UPDATED, JSON.stringify(result));
+    }
+
+
     return result;
 }
 
@@ -109,6 +121,11 @@ const deleteById = async (id: string): Promise<AcademicDepartment | null> => {
             academicFaculty: true
         }
     })
+
+    if (result) {
+        RedisClient.publish(EVENT_ACADEMIC_DEPARTMENT_DELETED, JSON.stringify(result));
+    }
+
     return result;
 }
 
