@@ -2,6 +2,7 @@ import { Server } from 'http';
 import app from './app';
 import config from './config';
 import { errorlogger, logger } from './shared/logger';
+import { RedisClient } from './shared/redis';
 
 
 async function bootstrap() {
@@ -10,6 +11,7 @@ async function bootstrap() {
     logger.info(`Server running on port ${config.port}`);
   });
 
+  await RedisClient.connect();
   const exitHandler = () => {
 
     if (server) {

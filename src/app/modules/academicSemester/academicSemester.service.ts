@@ -4,16 +4,27 @@ import { FilterOption } from "../../../constants/filterOption";
 import { paginationHelpers } from "../../../helpers/paginationHelper";
 import { IGenericResponse } from "../../../interfaces/common";
 import { IPaginationOptions } from "../../../interfaces/pagination";
-import { academicSemesterSearchableFields } from "./academicSemester.constant";
+import { RedisClient } from "../../../shared/redis";
+import { EVENT_ACADEMIC_SEMESTER_CREATED, EVENT_ACADEMIC_SEMESTER_DELETED, EVENT_ACADEMIC_SEMESTER_UPDATED, academicSemesterSearchableFields, academicSemesterTitleCodeMappping } from "./academicSemester.constant";
 import { IAcademicSemesterFilterRequest } from "./academicSemester.interface";
 
 
 const prisma = new PrismaClient();
 
 const insertIntoDB = async (data: AcademicSemester): Promise<AcademicSemester> => {
+
+    if (academicSemesterTitleCodeMappping[data.title] !== data.code) {
+        throw new Error('Invalid title and code combination')
+    }
+
     const result = await prisma.academicSemester.create({
         data
     })
+
+    if (result) {
+        RedisClient.publish(EVENT_ACADEMIC_SEMESTER_CREATED, JSON.stringify(result));
+    }
+
     return result;
 }
 
@@ -84,6 +95,11 @@ const updateById = async (id: string, data: AcademicSemester): Promise<AcademicS
         },
         data
     })
+
+    if (result) {
+        RedisClient.publish(EVENT_ACADEMIC_SEMESTER_UPDATED, JSON.stringify(result));
+    }
+
     return result;
 }
 
@@ -93,6 +109,10 @@ const deleteById = async (id: string): Promise<AcademicSemester> => {
             id
         }
     })
+
+    if (result) {
+        RedisClient.publish(EVENT_ACADEMIC_SEMESTER_DELETED, JSON.stringify(result));
+    }
     return result;
 }
 
