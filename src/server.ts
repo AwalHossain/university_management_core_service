@@ -1,5 +1,6 @@
 import { Server } from 'http';
 import app from './app';
+import subscribeEvent from './app/event';
 import config from './config';
 import { errorlogger, logger } from './shared/logger';
 import { RedisClient } from './shared/redis';
@@ -11,7 +12,12 @@ async function bootstrap() {
     logger.info(`Server running on port ${config.port}`);
   });
 
-  await RedisClient.connect();
+
+  // Redis client connection and subscribe to event
+  await RedisClient.connect().then(() => {
+    subscribeEvent();
+  });
+
   const exitHandler = () => {
 
     if (server) {
