@@ -1,9 +1,10 @@
+import initStudentEvent from "../modules/student/student.event";
 
 
 
 
-const subscribeEvent = () => {
-    console.log('subscribeEvent');
+const subscribeEvent = async () => {
+    await initStudentEvent();
 }
 
 

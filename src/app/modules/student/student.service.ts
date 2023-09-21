@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PrismaClient, Student, StudentEnrolledCourseStatus } from "@prisma/client";
 import { FilterOption } from "../../../constants/filterOption";
 import { paginationHelpers } from "../../../helpers/paginationHelper";
@@ -221,11 +222,41 @@ const getMyAcademicInfo = async (authUserId: string) => {
     return enrolledCourses;
 }
 
+
+const createStudentEvent = async (e: any) => {
+
+    const studentData: Partial<Student> = {
+        studentId: e.id,
+        firstName: e.name.firstName,
+        lastName: e.name.lastName,
+        middleName: e.name.middleName,
+        email: e.email,
+        contactNo: e.contactNo,
+        gender: e.gender,
+        bloodGroup: e.bloodGroup,
+        academicSemesterId: e.academicSemester.syncId,
+        academicDepartmentId: e.academicDepartment.syncId,
+        academicFacultyId: e.academicFaculty.syncId,
+        profileImage: e.profileImage,
+    };
+
+    console.log(studentData, 'studentData');
+
+
+
+    const result = await insertIntoDB(studentData as Student);
+    console.log(result, 'result');
+
+    // return result;
+}
+
+
 export const StudentService = {
     insertIntoDB,
     getAll,
     getById,
     myCourse,
     getMyCourseSchedules,
-    getMyAcademicInfo
+    getMyAcademicInfo,
+    createStudentEvent
 }
