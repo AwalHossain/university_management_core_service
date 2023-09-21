@@ -28,8 +28,14 @@ export const studentRelationalFields: string[] = [
     'academicSemesterId'
 ];
 
-export const studentRelationalFieldsMapper:{[key: string]: string} = {
+export const studentRelationalFieldsMapper: { [key: string]: string } = {
     'academicFacultyId': 'academicFaculty',
     'academicDepartmentId': 'academicDepartment',
     'academicSemesterId': 'academicSemester'
-}   
+}
+
+
+
+export const STUDENT_EVENT_CREATED = 'student_event_created';
+export const STUDENT_EVENT_UPDATED = 'student_event_updated';
+export const STUDENT_EVENT_DELETED = 'student_event_deleted';
