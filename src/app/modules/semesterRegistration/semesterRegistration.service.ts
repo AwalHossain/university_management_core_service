@@ -40,6 +40,9 @@ const insertIntoDB = async (data: SemesterRegistration) => {
     return await prisma.semesterRegistration.create({
         data: {
             ...data
+        },
+        include: {
+            academicSemester: true
         }
     })
 }
@@ -129,6 +132,9 @@ const updateById = async (id: string, data: SemesterRegistration) => {
         throw new ApiError(httpStatus.NOT_FOUND, 'Semester registration not found')
     }
 
+    console.log(data.status, 'data.status');
+
+
     if (isExist.status === SemesterRegistrationStatus.UPCOMING && data.status !== SemesterRegistrationStatus.ONGOING) {
         throw new ApiError(httpStatus.BAD_REQUEST, 'Semester registration status can only be changed to ongoing')
     }
@@ -175,6 +181,9 @@ const startMyRegistraion = async (authUserId: string): Promise<{
         throw new ApiError(httpStatus.NOT_FOUND, 'Student not found')
     }
 
+    console.log(studentInfo, 'studentInfo');
+
+
     const semesterRegistrationInfo = await prisma.semesterRegistration.findFirst({
         where: {
             OR: [
@@ -196,6 +205,9 @@ const startMyRegistraion = async (authUserId: string): Promise<{
      * }
      * }
      */
+
+    console.log(semesterRegistrationInfo, 'semesterRegistrationInfo');
+
 
     if (semesterRegistrationInfo?.status === SemesterRegistrationStatus.UPCOMING) {
         throw new ApiError(httpStatus.BAD_REQUEST, 'Semester registration is not started yet')
