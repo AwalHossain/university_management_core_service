@@ -6,65 +6,65 @@ import validateRequest from '../../middlewares/validateRequest';
 import { SemesterRegistrationController } from './semesterRegistration.controller';
 import { SemesterRegistrationValidation } from './semesterRegistration.validation';
 
-const Router = express.Router();
+const router = express.Router();
 
 
-Router.get('/get-my-registration',
+router.get('/get-my-registration',
 
     auth(ENUM_USER_ROLE.STUDENT),
     SemesterRegistrationController.getMyRegistration
 )
 
-Router.get('/semester-reg-course',
+router.get('/semester-reg-course',
 
     auth(ENUM_USER_ROLE.STUDENT),
     SemesterRegistrationController.getMySemesterRegCourse
 )
 
-Router.post('/',
+router.post('/',
     validateRequest(SemesterRegistrationValidation.create),
     SemesterRegistrationController.insertIntoDB)
 
-Router.get('/',
+router.get('/',
     SemesterRegistrationController.getAll)
 
-Router.get('/:id',
+router.get('/:id',
     SemesterRegistrationController.getById)
 
-Router.patch('/:id',
+router.patch('/:id',
     validateRequest(SemesterRegistrationValidation.update),
     SemesterRegistrationController.updateById)
 
-Router.delete('/:id',
+router.delete('/:id',
     SemesterRegistrationController.deleteById)
 
-Router.post(
+router.post(
     '/start-my-registration',
     auth(ENUM_USER_ROLE.STUDENT),
     SemesterRegistrationController.startMyRegistraion
 )
 
-Router.post(
+router.post(
     '/enroll-course',
     auth(ENUM_USER_ROLE.STUDENT),
     validateRequest(SemesterRegistrationValidation.enrollOrWithdrawCourse),
     SemesterRegistrationController.enrollCourse
 )
 
-Router.post(
+router.post(
     '/withdraw-course',
     auth(ENUM_USER_ROLE.STUDENT),
     validateRequest(SemesterRegistrationValidation.enrollOrWithdrawCourse),
     SemesterRegistrationController.withdrawCourse
 )
 
-Router.post('/confirm-my-registration',
+router.post('/confirm-my-registration',
 
     auth(ENUM_USER_ROLE.STUDENT),
     SemesterRegistrationController.confirmMyRegistration
 )
 
-Router.post(
+router.post(
     '/:id/start-new-semester',
     SemesterRegistrationController.startNewSemester
 )
@@ -73,4 +73,4 @@ Router.post(
 
 
 
-export const semesterRegistrationRoute = Router;
+export const semesterRegistrationRoute = router;
