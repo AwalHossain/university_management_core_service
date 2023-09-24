@@ -93,7 +93,6 @@ const deleteById = catchAsync(async (req: Request, res: Response) => {
 
 const startMyRegistraion = catchAsync(async (req: Request, res: Response) => {
     const user = (req as any).user;
-    // console.log(user,'check');
 
     const result = await SemesterRegistrationService.startMyRegistraion(user.userId);
 
