@@ -166,13 +166,26 @@ const getMyCourse = async (authUserId: {
 
 
 
-const createFacultyEvent = async (facultyData: any) => {
+const createFacultyEvent = async (e: any) => {
     // console.log(e, 'faculty');
 
 
 
     try {
-        ;
+        const facultyData: Partial<Faculty> = {
+            facultyId: e.id,
+            firstName: e.name.firstName,
+            lastName: e.name.lastName,
+            middleName: e.name.middleName,
+            profileImage: e.profileImage,
+            email: e.email,
+            contactNo: e.contactNo,
+            gender: e.gender,
+            bloodGroup: e.bloodGroup,
+            designation: e.designation,
+            academicDepartmentId: e.academicDepartment.syncId,
+            academicFacultyId: e.academicFaculty.syncId
+        };
         const result = await insertIntoDB(facultyData as Faculty);
         console.log(result, 'result');
 
@@ -190,8 +203,9 @@ const updateFacultyFromEvent = async (e: any): Promise<void> => {
             facultyId: e.id
         }
     })
+    console.log(isExist, 'isExist');
 
-    if (isExist) {
+    if (!isExist) {
         await createFacultyEvent(e);
     } else {
         const facultyData: Partial<Faculty> = {
@@ -209,11 +223,17 @@ const updateFacultyFromEvent = async (e: any): Promise<void> => {
             academicFacultyId: e.academicFaculty.syncId
         };
 
-        const result = await prisma.faculty.updateMany({
+        await prisma.faculty.updateMany({
             where: {
                 facultyId: e.id
             },
             data: facultyData
+        })
+
+        const result = await prisma.faculty.findUnique({
+            where: {
+                facultyId: e.id
+            }
         })
         console.log(result, 'result');
     }
