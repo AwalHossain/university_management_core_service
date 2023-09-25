@@ -27,7 +27,12 @@ export const facultyRelationalFields: string[] = [
 ];
 
 
-export const facultyRelationalFieldsMapper:{[key: string]: string} = {
+export const facultyRelationalFieldsMapper: { [key: string]: string } = {
     'academicFacultyId': 'academicFaculty',
     'academicDepartmentId': 'academicDepartment'
-}   
+}
+
+
+export const FACULTY_EVENT_CREATED = 'faculty_event_created';
+export const FACULTY_EVENT_UPDATED = 'faculty_event_updated';
+export const FACULTY_EVENT_DELETED = 'faculty_event_deleted';
