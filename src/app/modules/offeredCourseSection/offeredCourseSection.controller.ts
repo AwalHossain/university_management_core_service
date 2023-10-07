@@ -21,13 +21,14 @@ const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
 const getAll = catchAsync(async (req: Request, res: Response) => {
   const filterData = pick(req.query, offeredCourseSectionFilterableFields);
   const options = pick(req.query, paginationFields);
-  const result = await OfferedCourseSectionService.getAll(filterData, options);
+  const { data, meta } = await OfferedCourseSectionService.getAll(filterData, options);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "OfferedCourseSections retrieved successfully",
-    data: result,
+    data,
+    meta,
   });
 });
 

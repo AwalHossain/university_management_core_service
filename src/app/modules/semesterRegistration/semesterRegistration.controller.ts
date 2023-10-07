@@ -29,14 +29,15 @@ const getAll = catchAsync(async (req: Request, res: Response) => {
     const options = pick(req.query, paginationFields);
     console.log(filters, 'filters, options');
 
-    const result = await SemesterRegistrationService.getAll(filters, options);
+    const { data, meta } = await SemesterRegistrationService.getAll(filters, options);
 
     sendResponse(
         res, {
         success: true,
         statusCode: httpStatus.OK,
         message: "Semester registration fetched successfully",
-        data: result
+        data,
+        meta
     })
 
 })

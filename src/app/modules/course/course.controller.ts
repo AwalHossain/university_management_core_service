@@ -27,12 +27,13 @@ const getAll = catchAsync(async (req: Request, res: Response) => {
     const filter = pick(req.query, courseFilterableFields);
     const options = pick(req.query, paginationFields);
 
-    const result = await CourseService.getAll(filter, options);
+    const { data, meta } = await CourseService.getAll(filter, options);
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        data: result,
+        data: data,
+        meta: meta,
         message: "Courses fetched successfully"
     }
     )

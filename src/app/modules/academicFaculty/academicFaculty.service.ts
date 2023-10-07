@@ -55,6 +55,7 @@ const getAll = async (filter: IAcademicFacultyFilterRequest, options: IPaginatio
         where: whereCondition
     })
 
+
     return {
         data: result,
         meta: {

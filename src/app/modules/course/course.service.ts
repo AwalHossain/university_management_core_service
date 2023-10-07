@@ -179,7 +179,7 @@ const updateById = async (id: string, payload: Partial<IcourseCreateData>): Prom
 
 
             if (deletePrequisite.length > 0) {
-             await  asyncForEach(deletePrequisite, async (deletePreRequisite:IPreRequisiteCourseRequest) => {
+                await asyncForEach(deletePrequisite, async (deletePreRequisite: IPreRequisiteCourseRequest) => {
                     await tx.courseToPrerequisite.deleteMany({
                         where: {
                             AND: [
@@ -274,7 +274,7 @@ const deleteById = async (id: string): Promise<Course | null> => {
 
 const assignFaculty = async (courseId: string, payload: string[]): Promise<CourseToFaculty[] | null> => {
 
-     await prisma.courseToFaculty.createMany(
+    await prisma.courseToFaculty.createMany(
         {
             data: payload.map((facultyId) => ({
                 courseId,
@@ -282,16 +282,16 @@ const assignFaculty = async (courseId: string, payload: string[]): Promise<Cours
             }))
         }
     )
-        const  assignFacultiesData = await prisma.courseToFaculty.findMany({
-            where: {
-                courseId
-            },
-            include: {
-                faculty: true
-            }
-        })
+    const assignFacultiesData = await prisma.courseToFaculty.findMany({
+        where: {
+            courseId
+        },
+        include: {
+            faculty: true
+        }
+    })
 
-        return assignFacultiesData;
+    return assignFacultiesData;
 
 
 }

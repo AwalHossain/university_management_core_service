@@ -26,11 +26,11 @@ const getAll = catchAsync(async (req: Request, res: Response) => {
     const filter = pick(req.query, academicFacultyFilterableFields);
     const options = pick(req.query, paginationFields);
 
-    const result = await AcademicFacultyService.getAll(filter, options);
-
+    const { data, meta } = await AcademicFacultyService.getAll(filter, options);
     sendResponse(res, {
         success: true,
-        data: result,
+        data,
+        meta,
         message: 'Data fetched successfully',
         statusCode: httpStatus.OK
 

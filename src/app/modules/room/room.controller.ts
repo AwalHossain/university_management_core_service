@@ -9,42 +9,43 @@ import { RoomService } from "./room.service";
 
 
 
-const insertIntoDB = catchAsync(async (req:Request, res:Response) => {
-    
-        const result = await RoomService.insertIntoDB(req.body);
+const insertIntoDB = catchAsync(async (req: Request, res: Response) => {
 
-        sendResponse(res,{
-            success: true,
-            data: result,
-            message: 'Data inserted successfully',
-            statusCode: httpStatus.CREATED
+    const result = await RoomService.insertIntoDB(req.body);
 
-        })
+    sendResponse(res, {
+        success: true,
+        data: result,
+        message: 'Data inserted successfully',
+        statusCode: httpStatus.CREATED
+
+    })
 
 });
 
 
-const getAll = catchAsync(async (req:Request, res:Response) => {
+const getAll = catchAsync(async (req: Request, res: Response) => {
 
     const filters = pick(req.query, roomFilterableFields);
     const options = pick(req.query, paginationFields);
 
-    const result = await RoomService.getAll(filters, options);
+    const { data, meta } = await RoomService.getAll(filters, options);
 
-    sendResponse(res,{
+    sendResponse(res, {
         success: true,
-        data: result,
+        data,
+        meta,
         message: 'Data fetched successfully',
         statusCode: httpStatus.OK
     })
 });
 
-const getById = catchAsync(async (req:Request, res:Response) => {
+const getById = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
 
     const result = await RoomService.getById(id);
 
-    sendResponse(res,{
+    sendResponse(res, {
         success: true,
         data: result,
         message: 'Data fetched successfully',
@@ -53,12 +54,12 @@ const getById = catchAsync(async (req:Request, res:Response) => {
 
 });
 
-const updateById = catchAsync(async (req:Request, res:Response) => {
+const updateById = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
-     
+
     const result = await RoomService.updateById(id, req.body);
 
-    sendResponse(res,{
+    sendResponse(res, {
         success: true,
         data: result,
         message: 'Data updated successfully',
@@ -67,12 +68,12 @@ const updateById = catchAsync(async (req:Request, res:Response) => {
 
 });
 
-const deleteById = catchAsync(async (req:Request, res:Response) => {
+const deleteById = catchAsync(async (req: Request, res: Response) => {
     const { id } = req.params;
 
     const result = await RoomService.deleteById(id);
 
-    sendResponse(res,{
+    sendResponse(res, {
         success: true,
         data: result,
         message: 'Data deleted successfully',

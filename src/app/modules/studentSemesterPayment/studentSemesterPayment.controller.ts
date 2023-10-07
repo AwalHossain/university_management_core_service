@@ -13,11 +13,12 @@ const getAll = catchAsync(async (req: Request, res: Response) => {
 
     const filter = pick(req.query, studentSemesterPaymentFilterableFields)
     const options = pick(req.query, paginationFields)
-    const result = await StudentSemesterPaymentService.getAll(filter, options);
+    const { data, meta } = await StudentSemesterPaymentService.getAll(filter, options);
 
-    sendResponse(res,{
+    sendResponse(res, {
         success: true,
-        data: result,
+        data,
+        meta,
         message: 'Data fetched successfully',
         statusCode: httpStatus.OK
     })
