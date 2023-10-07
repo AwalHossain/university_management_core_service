@@ -35,24 +35,21 @@ const update = z.object({
                 isDeleted: z.boolean()
             })
         ).optional(),
-    
+
     })
-    })
+})
 
 
 
-    const assignOrRemoveFaculties = z.object({
-        body: z.object({
-            faculties: z.array(
-                z.object({
-                    facultyId: z.string({
-                        required_error: "Faculty Id is required"
-                    }),
-                })
-            )
-
+const assignOrRemoveFaculties = z.object({
+    body: z.object({
+        faculties: z.array(z.string(), {
+            required_error: "Facultis are required"
         })
     })
+})
+
+
 
 
 
