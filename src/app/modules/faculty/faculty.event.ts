@@ -19,7 +19,9 @@ const initFacultyEvent = async () => {
     })
 
     RedisClient.subscribe(FACULTY_EVENT_DELETED, async (e) => {
-        console.log(e)
+        const data = JSON.parse(e)
+
+        await FacultyService.deleteFromEvent(data);
     })
 }
 

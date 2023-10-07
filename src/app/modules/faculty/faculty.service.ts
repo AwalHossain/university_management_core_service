@@ -240,11 +240,24 @@ const updateFacultyFromEvent = async (e: any): Promise<void> => {
 
 }
 
+
+const deleteFromEvent = async (e: any): Promise<void> => {
+    const result = await prisma.faculty.delete({
+        where: {
+            facultyId: e.id
+        }
+    })
+    console.log(result, 'result');
+
+}
+
+
 export const FacultyService = {
     insertIntoDB,
     getAll,
     getById,
     getMyCourse,
     createFacultyEvent,
-    updateFacultyFromEvent
+    updateFacultyFromEvent,
+    deleteFromEvent
 }
